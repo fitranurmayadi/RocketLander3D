@@ -1,0 +1,32 @@
+BeginElementMap v1
+1 PostfixCount 3
+Edge
+Face
+Vertex
+
+MapCount 1
+
+ElementMap 1 1 3
+
+Edge
+
+ChildCount 1
+1 0 20 2137 0 ;:H859,E 0
+
+NameCount 0
+
+Face
+
+ChildCount 1
+1 0 13 2137 0 ;:H859,F 0
+
+NameCount 0
+
+Vertex
+
+ChildCount 1
+1 0 12 2137 0 ;:H859,V 0
+
+NameCount 0
+
+EndMap

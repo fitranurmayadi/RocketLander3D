@@ -1,0 +1,13 @@
+pybullet build time: Feb  5 2026 09:13:02
+========================================
+      LAPORAN VERIFIKASI DINAMIKA       
+========================================
+1. Thruster (Naik):          OK | Akselerasi = 10.00 m/s
+2. Putar Kiri (Yaw+):        OK | Rate = 1.3408 rad/s
+3. Miring Belakang (Pitch+): OK | Rate = -0.0850 rad/s
+4. Miring Depan (Pitch-):    OK | Rate = 0.0849 rad/s
+5. Miring Kanan (Roll+):     OK | Rate = 0.0845 rad/s
+6. Miring Kiri (Roll-):      OK | Rate = -0.0844 rad/s
+========================================
+DEBUG: Importing rocket_lander package (Executing __init__.py)
+DEBUG: Registered RocketLander-v0

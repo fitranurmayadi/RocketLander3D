@@ -1,0 +1,429 @@
+<?xml version="1.0"?>
+<robot name="rocket_lander">
+  <material name="grey"><color rgba="0.7 0.7 0.7 1"/></material>
+  <material name="dark"><color rgba="0.3 0.3 0.3 1"/></material>
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_main_body.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.5" length="5.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 -1.5" rpy="0 0 0"/>
+      <mass value="100.0"/>
+      <inertia ixx="214.6" ixy="0.0" ixz="0.0" iyy="214.6" iyz="0.0" izz="12.5"/>
+    </inertial>
+  </link>
+  <link name="rocket_thruster_main_engine_gimbal_intermed">
+    <inertial><mass value="0.1"/><inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/></inertial>
+  </link>
+  <joint name="joint_rocket_thruster_main_engine_pitch" type="revolute">
+    <parent link="base_link"/>
+    <child link="rocket_thruster_main_engine_gimbal_intermed"/>
+    <origin xyz="0.0 0.0 -2.8000000000000003" rpy="0.0 0.0 0.0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.35" upper="0.35" effort="20000" velocity="10.0"/>
+  </joint>
+  <link name="rocket_thruster_main_engine">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_thruster_main.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_thruster_main.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_thruster_main_engine_roll" type="revolute">
+    <parent link="rocket_thruster_main_engine_gimbal_intermed"/>
+    <child link="rocket_thruster_main_engine"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-0.35" upper="0.35" effort="20000" velocity="10.0"/>
+  </joint>
+  <link name="rocket_thruster_holder">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_thruster_holder.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_thruster_holder.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_thruster_holder" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_thruster_holder"/>
+    <origin xyz="0.0 0.0 -2.84" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <link name="rocket_foot_x_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_foot_x_plus" type="revolute">
+    <parent link="base_link"/>
+    <child link="rocket_foot_x_plus"/>
+    <origin xyz="0.55 0.0 -2.19" rpy="0.0 0.0 0.0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.6" upper="1.6" effort="100" velocity="1.0"/>
+  </joint>
+  <link name="rocket_foot_x_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_foot_x_neg" type="revolute">
+    <parent link="base_link"/>
+    <child link="rocket_foot_x_neg"/>
+    <origin xyz="-0.55 0.0 -2.19" rpy="0.0 0.0 3.141592653589793"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.6" upper="1.6" effort="100" velocity="1.0"/>
+  </joint>
+  <link name="rocket_foot_y_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_foot_y_neg" type="revolute">
+    <parent link="base_link"/>
+    <child link="rocket_foot_y_neg"/>
+    <origin xyz="-1.2212453270876723e-16 -0.55 -2.19" rpy="0.0 -0.0 -1.5707963267948968"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.6" upper="1.6" effort="100" velocity="1.0"/>
+  </joint>
+  <link name="rocket_foot_y_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_foot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_foot_y_plus" type="revolute">
+    <parent link="base_link"/>
+    <child link="rocket_foot_y_plus"/>
+    <origin xyz="1.2212453270876723e-16 0.55 -2.19" rpy="0.0 0.0 1.5707963267948963"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.6" upper="1.6" effort="100" velocity="1.0"/>
+  </joint>
+  <link name="rocket_rcs_yaw_y_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_yaw.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_yaw.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_yaw_y_plus" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_yaw_y_plus"/>
+    <origin xyz="0.0 0.5 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <link name="rocket_rcs_yaw_y_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_yaw.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_yaw.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_yaw_y_neg" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_yaw_y_neg"/>
+    <origin xyz="0.0 -0.5 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_upper_x_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_upper_x_plus" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_upper_x_plus"/>
+    <origin xyz="0.5 0.0 2.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_upper_x_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_upper_x_neg" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_upper_x_neg"/>
+    <origin xyz="-0.5 6.123233995736766e-17 2.0" rpy="0.0 0.0 3.141592653589793"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_upper_y_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_upper_y_plus" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_upper_y_plus"/>
+    <origin xyz="1.1102230246251565e-16 0.5 2.0" rpy="0.0 0.0 1.5707963267948963"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_upper_y_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_upper_y_neg" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_upper_y_neg"/>
+    <origin xyz="-1.1102230246251565e-16 -0.5 2.0" rpy="0.0 -0.0 -1.5707963267948968"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_bottom_x_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_bottom_x_plus" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_bottom_x_plus"/>
+    <origin xyz="0.5 0.0 -2.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_bottom_x_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_bottom_x_neg" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_bottom_x_neg"/>
+    <origin xyz="-0.5 6.12e-17 -2.0" rpy="0.0 0.0 3.141592653589793"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_bottom_y_plus">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_bottom_y_plus" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_bottom_y_plus"/>
+    <origin xyz="1.1099999999999999e-16 0.5 -2.0" rpy="0.0 0.0 1.5707963267948963"/>
+  </joint>
+  <link name="rocket_rcs_roll_pitch_bottom_y_neg">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/rocket_rcs_roll_pitch.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
+  <joint name="joint_rocket_rcs_roll_pitch_bottom_y_neg" type="fixed">
+    <parent link="base_link"/>
+    <child link="rocket_rcs_roll_pitch_bottom_y_neg"/>
+    <origin xyz="0.0 -0.5 -2.0" rpy="0.0 -0.0 -1.5707963267948968"/>
+  </joint>
+</robot>

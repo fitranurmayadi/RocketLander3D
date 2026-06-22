@@ -1,0 +1,58 @@
+DEBUG: Importing rocket_lander package (Executing __init__.py)
+DEBUG: Registered RocketLander-v0
+pybullet build time: Feb  5 2026 09:13:02
+startThreads creating 1 threads.
+starting thread 0
+started thread 0 
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+X11 functions dynamically loaded using dlopen/dlsym OK!
+X11 functions dynamically loaded using dlopen/dlsym OK!
+Creating context
+Created GL 3.3 context
+Direct GLX rendering context obtained
+Making context current
+GL_VENDOR=NVIDIA Corporation
+GL_RENDERER=NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2
+GL_VERSION=3.3.0 NVIDIA 550.163.01
+GL_SHADING_LANGUAGE_VERSION=3.30 NVIDIA via Cg compiler
+pthread_getconcurrency()=0
+Version = 3.3.0 NVIDIA 550.163.01
+Vendor = NVIDIA Corporation
+Renderer = NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2
+b3Printf: Selected demo: Physics Server
+startThreads creating 1 threads.
+starting thread 0
+started thread 0 
+MotionThreadFunc thread started
+ven = NVIDIA Corporation
+ven = NVIDIA Corporation
+DEBUG: Foot Links: [3, 4, 5, 6]
+Starting PID Landing (Standard Gym API)...
+Traceback (most recent call last):
+  File "/home/aiot/Projects/RocketLander/examples/pid_landing.py", line 103, in <module>
+    main()
+    ~~~~^^
+  File "/home/aiot/Projects/RocketLander/examples/pid_landing.py", line 100, in main
+    time.sleep(dt)
+    ~~~~~~~~~~^^^^
+KeyboardInterrupt
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed

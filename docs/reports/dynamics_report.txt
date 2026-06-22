@@ -1,0 +1,11 @@
+pybullet build time: Feb  5 2026 09:13:02
+========================================
+      DYNAMICS VERIFICATION REPORT      
+========================================
+1. Main Engine (Ascent):   PASS | dVz = 10.00 m/s (Expected > 0)
+2. RCS Yaw+ (Turn Left):   PASS | YawRate = 1.3408 rad/s (Expected > 0)
+3. RCS Pitch+ (Nose Up):   FAIL | PitchRate = -0.0850 rad/s (Expected > 0)
+4. RCS Roll+ (Right Up):   PASS | RollRate = 0.0845 rad/s (Expected > 0)
+========================================
+DEBUG: Importing rocket_lander package (Executing __init__.py)
+DEBUG: Registered RocketLander-v0
