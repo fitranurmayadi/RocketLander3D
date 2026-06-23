@@ -1,0 +1,99 @@
+ÿþDEBUG: Importing rocket_lander package (Executing __init__.py)
+DEBUG: Registered RocketLander-v0
+DEBUG: rocket_lander imported from: C:\Users\User\Documents\Projects\RocketLander3D\rocket_lander\__init__.py
+DEBUG: env.unwrapped.randomize_spawn = False
+DEBUG: Reset Initial Pos: [250, 250, 250]
+[0.0s] RECOVERY DH: 353.6 CP: [250. 250.] T_Y: -2.36
+      AX/AY: 0.0/0.0 AH/AL: 0.0/0.0 TP/TR: 0.00/0.00
+      RPY: [0.52, -0.52, 0.00] Cmd_Vel: [0 0 0] Cur_Vel: [0. 0. 0.]
+[1.0s] RECOVERY DH: 349.8 CP: [247.5011  247.12343] T_Y: -2.36
+      AX/AY: 16.2/16.8 AH/AL: 14.5/18.3 TP/TR: -1.00/-1.00
+      RPY: [0.51, -0.55, -0.10] Cmd_Vel: [0 0 0] Cur_Vel: [-5.3907266 -5.6164155 -1.0982058]
+[2.0s] RECOVERY DH: 337.5 CP: [238.70808 238.65317] T_Y: -2.36
+      AX/AY: 37.5/33.5 AH/AL: 29.9/40.5 TP/TR: -1.00/-1.00
+      RPY: [0.51, -0.57, -0.20] Cmd_Vel: [0 0 0] Cur_Vel: [-12.4883375 -11.183264   -1.4730978]
+[3.0s] RECOVERY DH: 316.2 CP: [222.21251 224.98265] T_Y: -2.35
+      AX/AY: 62.2/48.3 AH/AL: 43.6/65.6 TP/TR: -1.00/-1.00
+      RPY: [0.51, -0.60, -0.32] Cmd_Vel: [0 0 0] Cur_Vel: [-20.73917   -16.092297   -1.4255953]
+[4.0s] RECOVERY DH: 285.6 CP: [196.88988 206.9547 ] T_Y: -2.33
+      AX/AY: 89.9/59.6 AH/AL: 54.8/92.8 TP/TR: -1.00/-1.00
+      RPY: [0.52, -0.63, -0.45] Cmd_Vel: [0 0 0] Cur_Vel: [-29.952028 -19.855612  -1.237701]
+[5.0s] RECOVERY DH: 246.4 CP: [161.88774 185.73285] T_Y: -2.29
+      AX/AY: 119.9/66.9 AH/AL: 63.5/121.8 TP/TR: -1.00/-1.00
+      RPY: [0.54, -0.67, -0.58] Cmd_Vel: [0 0 0] Cur_Vel: [-39.964462  -22.309494   -1.0984513]
+[6.0s] RECOVERY DH: 200.2 CP: [116.59186 162.71002] T_Y: -2.19
+      AX/AY: 151.7/70.0 AH/AL: 69.6/151.8 TP/TR: -1.00/-1.00
+      RPY: [0.56, -0.71, -0.71] Cmd_Vel: [0 0 0] Cur_Vel: [-50.553997  -23.330603   -1.0610484]
+[7.0s] RECOVERY DH: 152.0 CP: [ 60.57837 139.45576] T_Y: -1.98
+      AX/AY: 184.5/68.2 AH/AL: 74.2/182.2 TP/TR: -1.00/-1.00
+      RPY: [0.59, -0.76, -0.83] Cmd_Vel: [0 0 0] Cur_Vel: [-61.510273  -22.73299    -1.0948211]
+[8.0s] RECOVERY DH: 117.9 CP: [ -6.43953 117.6931 ] T_Y: -1.52
+      AX/AY: 218.0/61.0 AH/AL: 81.7/211.1 TP/TR: -1.00/-1.00
+      RPY: [0.60, -0.83, -0.93] Cmd_Vel: [0 0 0] Cur_Vel: [-72.6645    -20.3212     -1.1775358]
+[9.0s] RECOVERY DH: 130.5 CP: [-84.73754  99.27887] T_Y: -0.86
+      AX/AY: 252.5/47.9 AH/AL: 100.4/236.6 TP/TR: -1.00/-1.00
+      RPY: [0.59, -0.93, -0.98] Cmd_Vel: [0 0 0] Cur_Vel: [-84.172035 -15.957102  -1.448557]
+[10.0s] RECOVERY DH: 194.8 CP: [-174.69688   86.20259] T_Y: -0.46
+      AX/AY: 286.8/29.7 AH/AL: 172.5/231.1 TP/TR: -1.00/-1.00
+      RPY: [0.41, -1.02, -0.83] Cmd_Vel: [0 0 0] Cur_Vel: [-95.6041    -9.904939  -1.668727]
+[11.0s] RECOVERY DH: 285.3 CP: [-273.85248   79.91717] T_Y: -0.28
+      AX/AY: 300.0/7.8 AH/AL: 230.1/192.6 TP/TR: -1.00/-1.00
+      RPY: [0.21, -1.05, -0.67] Cmd_Vel: [0 0 0] Cur_Vel: [-100.          -2.6151137   -1.396997 ]
+[12.0s] RECOVERY DH: 382.6 CP: [-373.85248   81.41294] T_Y: -0.21
+      AX/AY: 300.0/-17.0 AH/AL: 272.7/126.2 TP/TR: -1.00/-1.00
+      RPY: [-0.00, -1.06, -0.49] Cmd_Vel: [0 0 0] Cur_Vel: [-100.            5.6576853    -0.65633285]
+[13.0s] RECOVERY DH: 482.6 CP: [-473.85248   91.40765] T_Y: -0.19
+      AX/AY: 300.0/-42.6 AH/AL: 297.5/57.5 TP/TR: -1.00/-1.00
+      RPY: [-0.20, -1.07, -0.33] Cmd_Vel: [0 0 0] Cur_Vel: [-1.0000000e+02  1.4187407e+01 -9.1763556e-02]
+[14.0s] RECOVERY DH: 584.4 CP: [-573.8525   110.61183] T_Y: -0.19
+      AX/AY: 300.0/-72.1 AH/AL: 307.4/26.0 TP/TR: -1.00/-1.00
+      RPY: [-0.29, -1.08, -0.32] Cmd_Vel: [0 0 0] Cur_Vel: [-100.           24.025799      0.24973293]
+[15.0s] RECOVERY DH: 688.3 CP: [-673.8523   140.15527] T_Y: -0.21
+      AX/AY: 300.0/-105.1 AH/AL: 317.3/19.6 TP/TR: -1.00/-1.00
+      RPY: [-0.31, -1.09, -0.40] Cmd_Vel: [0 0 0] Cur_Vel: [-100.           35.022236      0.50485253]
+[16.0s] RECOVERY DH: 794.8 CP: [-773.8475  181.078 ] T_Y: -0.23
+      AX/AY: 300.0/-141.0 AH/AL: 331.1/16.2 TP/TR: -1.00/-1.00
+      RPY: [-0.33, -1.10, -0.49] Cmd_Vel: [0 0 0] Cur_Vel: [-99.99999     46.997807     0.65050644]
+[17.0s] RECOVERY DH: 904.6 CP: [-873.81244  234.16173] T_Y: -0.26
+      AX/AY: 300.0/-178.5 AH/AL: 348.9/12.1 TP/TR: -1.00/-1.00
+      RPY: [-0.37, -1.10, -0.57] Cmd_Vel: [0 0 0] Cur_Vel: [-100.           59.49833       0.82150656]
+[18.0s] RECOVERY DH: 1018.8 CP: [-973.676    299.85516] T_Y: -0.30
+      AX/AY: 299.7/-216.0 AH/AL: 369.0/18.3 TP/TR: -1.00/-1.00
+      RPY: [-0.41, -1.10, -0.67] Cmd_Vel: [0 0 0] Cur_Vel: [-99.89297    72.00124     1.1620045]
+[19.0s] RECOVERY DH: 1137.4 CP: [-1072.6393    378.29938] T_Y: -0.34
+      AX/AY: 292.3/-253.7 AH/AL: 384.7/42.5 TP/TR: -1.00/-1.00
+      RPY: [-0.41, -1.12, -0.82] Cmd_Vel: [0 0 0] Cur_Vel: [-97.437      84.56683     1.2826971]
+[20.0s] RECOVERY DH: 1258.3 CP: [-1167.4583   469.438 ] T_Y: -0.38
+      AX/AY: 273.9/-291.5 AH/AL: 397.6/43.2 TP/TR: -1.00/-1.00
+      RPY: [-0.48, -1.13, -0.92] Cmd_Vel: [0 0 0] Cur_Vel: [-91.29531    97.16181     1.3745084]
+[21.0s] RECOVERY DH: 1377.4 CP: [-1254.3517    569.14667] T_Y: -0.43
+      AX/AY: 245.7/-300.0 AH/AL: 382.4/64.0 TP/TR: -1.00/-1.00
+      RPY: [-0.53, -1.18, -1.05] Cmd_Vel: [0 0 0] Cur_Vel: [-81.89533   100.          1.3535805]
+[22.0s] RECOVERY DH: 1489.1 CP: [-1330.3031    669.13934] T_Y: -0.47
+      AX/AY: 208.4/-300.0 AH/AL: 341.3/-130.1 TP/TR: -1.00/1.00
+      RPY: [-0.95, -1.05, -0.60] Cmd_Vel: [0 0 0] Cur_Vel: [-69.477936  100.          1.4382881]
+MISSION TERMINATED at T=22.10s. Final Error: 1501.5710m Alt: 242.73m
+>>> FAIL: Target precision not reached. <<<
+Telemetry saved to ultimate_mission_report.png
+starting thread 0
+started testThreads thread 0 with threadHandle 0000000000000410
+argc=2
+argv[0] = --unused
+argv[1] = --start_demo_name=Physics Server
+ExampleBrowserThreadFunc started
+Version = 4.6.0 NVIDIA 581.95
+Vendor = NVIDIA Corporation
+Renderer = NVIDIA GeForce RTX 3060/PCIe/SSE2
+b3Printf: Selected demo: Physics Server
+starting thread 0
+started MotionThreads thread 0 with threadHandle 00000000000007B0
+MotionThreadFunc thread started
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 with handle 00000000000007B0 exiting
+Thread TERMINATED
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 with handle 0000000000000410 exiting
+Thread TERMINATED

@@ -37,3 +37,9 @@ ENV/
 # OS
 .DS_Store
 .directory
+
+# Generated Data
+output/
+*.csv
+*.txt
+

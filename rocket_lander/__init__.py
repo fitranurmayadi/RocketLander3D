@@ -9,3 +9,12 @@ register(
 )
 
 print("DEBUG: Registered RocketLander-v0")
+
+register(
+    id="RocketLander-v1",
+    entry_point="rocket_lander.envs:RocketLanderEnv",
+    max_episode_steps=60000,
+    kwargs={"mission_mode": True},
+)
+
+print("DEBUG: Registered RocketLander-v1 (mission_mode)")

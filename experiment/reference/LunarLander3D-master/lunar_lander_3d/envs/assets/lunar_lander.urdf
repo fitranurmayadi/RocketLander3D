@@ -1,0 +1,417 @@
+<?xml version="1.0"?>
+<robot name="lunar_lander">
+  
+  <!-- ===================================================== -->
+  <!-- 1) MAIN BODY: Silinder dengan diameter 4 m, tinggi 4 m -->
+  <!-- ===================================================== -->
+  <link name="main_body">
+    <inertial>
+      <origin xyz="0 0 8.0" rpy="0 0 0"/>
+      <mass value="3500"/>
+      <!-- Perhitungan inersia untuk silinder dengan M=3500, R=8.0, L=16.0 (Scaled 4x) -->
+      <!-- Ixx = Iyy = 1/12 * M * (3R^2 + L^2) = 1/12 * 3500 * (3*64 + 256) = 1/12 * 3500 * 448 = 130666.7 -->
+      <!-- Izz = 1/2 * M * R^2 = 0.5 * 3500 * 64 = 112000 -->
+      <inertia ixx="130666.7" ixy="0" ixz="0" iyy="130666.7" iyz="0" izz="112000"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- Skala diperbesar 4x -->
+        <mesh filename="meshes/MainBody.dae" scale="4 4 4"/>
+      </geometry>
+      <material name="silver">
+        <color rgba="0.8 0.8 0.8 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/MainBody.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <!-- ===================================================== -->
+  <!-- 2) MAIN THRUSTER -->
+  <!-- ===================================================== -->
+  <link name="main_thruster">
+    <inertial>
+      <origin xyz="0 0 6.88" rpy="0 0 0"/>
+      <mass value="500"/>
+      <inertia ixx="800" ixy="0" ixz="0" iyy="800" iyz="0" izz="320"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/MainThruster.dae" scale="4 4 4"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/MainThruster.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="main_thruster_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="main_thruster"/>
+    <origin xyz="0 0 0.0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- ===================================================== -->
+  <!-- 3) RCS Thrusters (4 buah) -->
+  <!-- ===================================================== -->
+  <!-- RCS Front (RCSF): origin: (2.2, 0, 2.4) -->
+  <link name="rcs_front">
+    <inertial>
+      <origin xyz="8.8 0 9.6" rpy="0 0 0"/>
+      <mass value="100"/>
+      <inertia ixx="160" ixy="0" ixz="0" iyy="160" iyz="0" izz="160"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSF.dae" scale="4 4 4"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSF.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="rcs_front_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="rcs_front"/>
+    <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- RCS Back (RCSB): origin di (-2.2, 0, 2.4) -->
+  <link name="rcs_back">
+    <inertial>
+      <origin xyz="-8.8 0 9.6" rpy="0 0 0"/>
+      <mass value="100"/>
+      <inertia ixx="160" ixy="0" ixz="0" iyy="160" iyz="0" izz="160"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSB.dae" scale="4 4 4"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSB.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="rcs_back_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="rcs_back"/>
+    <origin xyz="0 0 0 " rpy="0 0 0"/>
+  </joint>
+  
+  <!-- RCS Left (RCSL): origin di (0, 2.2, 2.4) -->
+  <link name="rcs_left">
+    <inertial>
+      <origin xyz="0 8.8 9.6" rpy="0 0 0"/>
+      <mass value="100"/>
+      <inertia ixx="160" ixy="0" ixz="0" iyy="160" iyz="0" izz="160"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSL.dae" scale="4 4 4"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSL.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="rcs_left_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="rcs_left"/>
+    <origin xyz="0 0 0 " rpy="0 0 0"/>
+  </joint>
+  
+  <!-- RCS Right (RCSR): origin di (0, -2.2, 2.4) -->
+  <link name="rcs_right">
+    <inertial>
+      <origin xyz="0 -8.8 9.6" rpy="0 0 0"/>
+      <mass value="100"/>
+      <inertia ixx="160" ixy="0" ixz="0" iyy="160" iyz="0" izz="160"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSR.dae" scale="4 4 4"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/RCSR.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="rcs_right_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="rcs_right"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- ===================================================== -->
+  <!-- 4) LEGS (4 buah) -->
+  <!-- ===================================================== -->
+  <!-- Pasang kaki dengan offset 4x lipat -->
+  <!-- Leg Front Left (LegFL) -->
+  <link name="leg_front_left">
+    <inertial>
+      <origin xyz="6.16 6.16 -1.936" rpy="0 0 0"/>
+      <mass value="150"/>
+      <inertia ixx="80" ixy="0" ixz="0" iyy="80" iyz="0" izz="32"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegFL.dae" scale="4 4 4"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegFL.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_front_left_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="leg_front_left"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- Leg Front Right (LegFR) -->
+  <link name="leg_front_right">
+    <inertial>
+      <origin xyz="6.16 -6.16 -1.936" rpy="0 0 0"/>
+      <mass value="150"/>
+      <inertia ixx="80" ixy="0" ixz="0" iyy="80" iyz="0" izz="32"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegFR.dae" scale="4 4 4"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegFR.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_front_right_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="leg_front_right"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- Leg Back Left (LegBL) -->
+  <link name="leg_back_left">
+    <inertial>
+      <origin xyz="-6.16 6.16 -1.936" rpy="0 0 0"/>
+      <mass value="150"/>
+      <inertia ixx="80" ixy="0" ixz="0" iyy="80" iyz="0" izz="32"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegBL.dae" scale="4 4 4"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegBL.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_back_left_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="leg_back_left"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- Leg Back Right (LegBR) -->
+  <link name="leg_back_right">
+    <inertial>
+      <origin xyz="-6.16 -6.16 -1.936" rpy="0 0 0"/>
+      <mass value="150"/>
+      <inertia ixx="80" ixy="0" ixz="0" iyy="80" iyz="0" izz="32"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegBR.dae" scale="4 4 4"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/LegBR.dae" scale="4 4 4"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_back_right_joint" type="fixed">
+    <parent link="main_body"/>
+    <child link="leg_back_right"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- ===================================================== -->
+  <!-- 5) SENSOR KAKI (Red Spheres) -->
+  <!-- ===================================================== -->
+  <!-- Origin sensor juga dikali 4 -->
+  <link name="leg_front_left_sensor">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- 0.0625 * 4 = 0.25 for scaled version -->
+        <sphere radius="0.25"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_front_left_sensor_joint" type="fixed">
+    <parent link="leg_front_left"/>
+    <child link="leg_front_left_sensor"/>
+    <!-- CORRECT: 0.505*4=2.02, 0.505*4=2.02, -0.415*4=-1.66 -->
+    <origin xyz="2.02 2.02 -1.66" rpy="0 0 0"/>
+  </joint>
+
+  <link name="leg_back_right_sensor">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_back_right_sensor_joint" type="fixed">
+    <parent link="leg_back_right"/>
+    <child link="leg_back_right_sensor"/>
+    <!-- CORRECT: -0.505*4=-2.02, -0.505*4=-2.02, -0.415*4=-1.66 -->
+    <origin xyz="-2.02 -2.02 -1.66" rpy="0 0 0"/>
+  </joint>
+  
+  <link name="leg_front_right_sensor">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_front_right_sensor_joint" type="fixed">
+    <parent link="leg_front_right"/>
+    <child link="leg_front_right_sensor"/>
+    <!-- CORRECT: 0.505*4=2.02, -0.505*4=-2.02, -0.415*4=-1.66 -->
+    <origin xyz="2.02 -2.02 -1.66" rpy="0 0 0"/>
+  </joint>
+
+  <link name="leg_back_left_sensor">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.25"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="leg_back_left_sensor_joint" type="fixed">
+    <parent link="leg_back_left"/>
+    <child link="leg_back_left_sensor"/>
+    <!-- CORRECT: -0.505*4=-2.02, 0.505*4=2.02, -0.415*4=-1.66 -->
+    <origin xyz="-2.02 2.02 -1.66" rpy="0 0 0"/>
+  </joint>
+</robot>

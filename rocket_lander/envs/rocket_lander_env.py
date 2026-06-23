@@ -1,6 +1,7 @@
 import gymnasium as gym
 import time
 from gymnasium import spaces
+# pyrefly: ignore [missing-import]
 import pybullet as p
 import pybullet_data
 import numpy as np
@@ -12,27 +13,28 @@ from typing import Optional, Dict, Any, Tuple, List
 class RocketLanderEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 30}
 
-    def __init__(self, render_mode: Optional[str] = None, normalize_obs: bool = True, randomize_spawn: bool = True):
+    def __init__(self, render_mode: Optional[str] = None, normalize_obs: bool = True, randomize_spawn: bool = True, mission_mode: bool = False):
         super(RocketLanderEnv, self).__init__()
         
         self.render_mode = render_mode
         self.normalize_obs = normalize_obs
         self.randomize_spawn = randomize_spawn
+        self.mission_mode = mission_mode
         self.STEPS_PER_CONTROL = 4  # 60Hz Control (Physics is 240Hz)
         self.dt = (1.0 / 240.0) * self.STEPS_PER_CONTROL
         
         # Physics Parameters
-        self.MAIN_ENGINE_POWER = 60000.0
-        self.RCS_FORCE = 1000.0
+        self.MAIN_ENGINE_POWER = 100000.0
+        self.RCS_FORCE = 6000.0
         # Aerodynamics Constants
         self.DRAG_COEFF = 0.5
         self.GND_EFF_COEFF = 0.8  # Extra thrust multiplier at ground level
         self.GND_EFF_H_CLIP = 6.0 # Height in meters where ground effect starts
         self.gravity = -9.81
         
-        # Mass Properties
-        self.MIN_MASS = 300.0
-        self.MAX_MASS = 3000.0
+        # Mass Properties (for fast PID calibration: keep constant mass)
+        self.MIN_MASS = 1000.0
+        self.MAX_MASS = 1000.0
         self.FUEL_MASS = self.MAX_MASS - self.MIN_MASS
 
         # Normalization Scales
@@ -50,7 +52,7 @@ class RocketLanderEnv(gym.Env):
         self.fuel = 1.0
         self.fuel_consumption_rate = 0.0001 
         self.rcs_fuel_rate = 0.00005
-        self.max_steps = 10000              # ~166 seconds at 60Hz
+        self.max_steps = 30000 if mission_mode else 10000
         self.step_count = 0
         
         self.rocketId: Optional[int] = None
@@ -62,7 +64,7 @@ class RocketLanderEnv(gym.Env):
         
         # Visualization State
         self.camera_target = np.array([0.0, 0.0, 10.0])
-        self.camera_dist = 25.0
+        self.camera_dist = 10.0
         
         # RCS Thruster Configuration
         self.rcs_config = [
@@ -91,6 +93,7 @@ class RocketLanderEnv(gym.Env):
             
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.resetSimulation()
+        p.setRealTimeSimulation(0)
         p.setTimeStep(1.0 / 240.0)
         p.setGravity(0, 0, self.gravity)
         self._create_terrain()
@@ -136,7 +139,7 @@ class RocketLanderEnv(gym.Env):
         self.terrain_id = p.createMultiBody(0, terrain_shape, basePosition=[0, 0, (np.max(heights)+np.min(heights))/2.0])
         p.changeVisualShape(self.terrain_id, -1, rgbaColor=[0.7, 0.7, 0.72, 1], textureUniqueId=-1)
 
-        pad_visual = p.createVisualShape(p.GEOM_CYLINDER, radius=15.0, length=0.1, rgbaColor=[0.8, 0.1, 0.1, 0.8])
+        pad_visual = p.createVisualShape(p.GEOM_CYLINDER, radius=1.5, length=0.1, rgbaColor=[0.8, 0.1, 0.1, 0.8])
         self.pad_id = p.createMultiBody(baseVisualShapeIndex=pad_visual, basePosition=[0, 0, 0.05])
 
     def reset(self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None) -> Tuple[np.ndarray, Dict[str, Any]]:
@@ -179,6 +182,8 @@ class RocketLanderEnv(gym.Env):
                 initial_vel = [0.0, 0.0, 0.0]
                 initial_ang_vel = [0.0, 0.0, 0.0]
             if "initial_orn" in options: initial_orn = options["initial_orn"]
+            if "initial_vel" in options: initial_vel = options["initial_vel"]
+            if "initial_ang_vel" in options: initial_ang_vel = options["initial_ang_vel"]
             
         print(f"DEBUG: Reset Initial Pos: {initial_pos}")
         p.resetBasePositionAndOrientation(self.rocketId, initial_pos, initial_orn)
@@ -200,6 +205,7 @@ class RocketLanderEnv(gym.Env):
     
         # Reset camera to follow rocket immediately
         self.camera_target = np.array(initial_pos)
+        self.start_real_time = time.time()
         
         return self._get_obs(), {}
 
@@ -247,8 +253,9 @@ class RocketLanderEnv(gym.Env):
         
         # 2. Variable Mass & Fuel
         rcs_powers = np.clip((action[3:15] + 1.0) / 2.0, 0.0, 1.0)
-        self.fuel = max(0.0, self.fuel - (throttle_cmd * self.fuel_consumption_rate + np.sum(rcs_powers) * self.rcs_fuel_rate) * self.STEPS_PER_CONTROL)
-        curr_m = self.MIN_MASS + (self.FUEL_MASS * self.fuel)
+        # Keep fuel constant during calibration mode
+        self.fuel = 1.0
+        curr_m = self.MIN_MASS
         r, L = 0.5, 5.0
         i_v = 0.5 * curr_m * (r**2)
         i_l = (1.0/12.0) * curr_m * (L**2) + (1.0/4.0) * curr_m * (r**2)
@@ -275,7 +282,7 @@ class RocketLanderEnv(gym.Env):
             
             for i, cfg in enumerate(self.rcs_config):
                 if rcs_powers[i] > 0.1:
-                    mag = (200.0 if cfg["type"] == "yaw" else self.RCS_FORCE) * m_ratio
+                    mag = (2000.0 if cfg["type"] == "yaw" else self.RCS_FORCE) * m_ratio
                     f = [d * rcs_powers[i] * mag for d in cfg["dir"]]
                     p.applyExternalForce(self.rocketId, -1, f, cfg["pos"], p.LINK_FRAME)
 
@@ -295,9 +302,31 @@ class RocketLanderEnv(gym.Env):
                 
             p.stepSimulation()
             
+        if self.render_mode == "human":
+            curr_pos, curr_quat = p.getBasePositionAndOrientation(self.rocketId)
+            self.camera_target = np.array(curr_pos) # Lock exactly to rocket to prevent visual lag/jitter
+            target_dist = min(50.0, 10.0 + curr_pos[2] * 0.04)
+            self.camera_dist = 0.9 * self.camera_dist + 0.1 * target_dist
+            p.resetDebugVisualizerCamera(cameraDistance=self.camera_dist, cameraYaw=45, cameraPitch=-25, cameraTargetPosition=self.camera_target)
+            time.sleep(1.0 / 60.0) # Render at 60Hz to prevent PyBullet GUI stuttering
+            
         obs = self._get_obs()
-        reward = self._compute_reward(obs, action)
         self.step_count += 1
+        
+        # --- Mission mode: no reward, no auto-termination ---
+        if self.mission_mode:
+            truncated = self.step_count >= self.max_steps
+            # Only terminate on extreme OOB
+            if self.normalize_obs:
+                pos_check = obs[0:3] * self.POS_SCALE
+            else:
+                pos_check = obs[0:3]
+            oob = (np.linalg.norm(pos_check[0:2]) > 2500.0 or
+                   pos_check[2] > 1500.0 or pos_check[2] < -50.0)
+            return obs, 0.0, oob, truncated, {}
+        
+        # --- Standard RL mode (unchanged) ---
+        reward = self._compute_reward(obs, action)
         
         # 5. Terminations
         if self.normalize_obs:
@@ -411,7 +440,7 @@ class RocketLanderEnv(gym.Env):
         
         curr_pos, curr_quat = p.getBasePositionAndOrientation(self.rocketId)
         self.camera_target = 0.7 * self.camera_target + 0.3 * np.array(curr_pos)
-        self.camera_dist = 0.7 * self.camera_dist + 0.3 * (15.0 + curr_pos[2] * 0.1)
+        self.camera_dist = 0.7 * self.camera_dist + 0.3 * (7.5 + curr_pos[2] * 0.05)
         
         view_matrix = p.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=self.camera_target, distance=self.camera_dist,
@@ -423,8 +452,7 @@ class RocketLanderEnv(gym.Env):
             rgb_array = np.array(px, dtype=np.uint8).reshape((480, 640, 4))[:, :, :3]
             return rgb_array
         elif self.render_mode == "human":
-            p.resetDebugVisualizerCamera(cameraDistance=self.camera_dist, cameraYaw=45, cameraPitch=-25, cameraTargetPosition=self.camera_target)
-            time.sleep(self.dt)
+            pass
         return None
 
     def close(self):

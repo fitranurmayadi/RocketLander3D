@@ -138,9 +138,12 @@ class RocketPIDTrajectoryController:
         self.vy_pid = PID(kp=-0.1, ki=-0.0, kd=-0.02, target=0.0)
         
         # 4. Attitude Control (Gimbal/RCS)
-        self.pitch_pid = PID(kp=-1.5, ki=-0.0, kd=-3.0, target=0)
-        self.roll_pid = PID(kp=-3.0, ki=-0.0, kd=-6.0, target=0) 
-        self.yaw_pid = PID(kp=4.0, ki=0.0, kd=2.0, target=0)
+        # Updated with more aggressive attitude calibration gains (attitude -> desired body rates)
+        # roll/pitch: target small angles to zero; yaw: also to zero.
+        self.pitch_pid = PID(kp=-3.8, ki=-0.0, kd=-2.0, target=0) 
+        self.roll_pid = PID(kp=-3.8, ki=-0.0, kd=-2.0, target=0) 
+        self.yaw_pid = PID(kp=2.6, ki=0.0, kd=1.8, target=0)
+
         
         self.max_gimbal_deg = 20.0
         self.max_motor_torque = 50000.0
@@ -206,8 +209,16 @@ class RocketPIDTrajectoryController:
             max_tilt = 0.04  # 2 deg
         
         # --- 3. Horizontal -> Attitude (With Clipping) ---
-        raw_target_p = np.clip(self.vx_pid.compute(vx, dt), -max_tilt, max_tilt)
-        raw_target_r = np.clip(self.vy_pid.compute(vy, dt), -max_tilt, max_tilt)
+        # Use trajectory velocity references to generate attitude targets.
+        # Map desired horizontal velocity tracking error -> attitude.
+        # Use ref values (ref_vx/ref_vy) to avoid persistent tilt when the measured
+        # velocity still lags behind the plan.
+        vel_err_x = ref_vx - vx
+        vel_err_y = ref_vy - vy
+        raw_target_p = np.clip(self.vx_pid.kp * vel_err_x + self.vx_pid.kd * (0.0), -max_tilt, max_tilt)
+        raw_target_r = np.clip(self.vy_pid.kp * vel_err_y + self.vy_pid.kd * (0.0), -max_tilt, max_tilt)
+
+
         
         alpha_s = 0.1
         self.smooth_tgt_p = (1-alpha_s)*self.smooth_tgt_p + alpha_s*raw_target_p
@@ -267,8 +278,10 @@ class RocketPIDTrajectoryController:
         # Gimbal commands (relaxed limits for trajectory tracking)
         t_scale = 1.0 / np.sqrt(np.clip(throttle_cmd, 0.05, 1.0))
         max_gimbal_rad = 0.15  # ~8.6 degrees (relaxed from 5 deg)
-        gimbal_p = np.clip((err_wy * kp_r + (0 - wy) * k_damp) * t_scale, -max_gimbal_rad, max_gimbal_rad)
-        gimbal_r = np.clip((err_wx * kp_r + (0 - wx) * k_damp) * t_scale, -max_gimbal_rad, max_gimbal_rad)
+# NOTE: gimbal polarity in env is such that positive command produces negative torque (see verify_gimbal_polarity.py).
+        # Invert commands so controller sign matches the physical effect.
+        gimbal_p = -np.clip((err_wy * kp_r + (0 - wy) * k_damp) * t_scale, -max_gimbal_rad, max_gimbal_rad)
+        gimbal_r = -np.clip((err_wx * kp_r + (0 - wx) * k_damp) * t_scale, -max_gimbal_rad, max_gimbal_rad)
         yaw_out = (0 - wz) * 1.5 
         
         self.last_telem = f"[{state_str}] Alt:{altitude:.1f} RefV:[{ref_vx:.1f},{ref_vy:.1f},{ref_vz:.1f}] Thr:{throttle_cmd:.2f}"
@@ -304,7 +317,7 @@ class RocketPIDTrajectoryController:
             action[3+10]=1.0; action[3+11]=1.0 
             
         # Legs
-        if altitude < 30.0:
+        if altitude < 50.0:
             action[15] = 1.0
             
         return action
