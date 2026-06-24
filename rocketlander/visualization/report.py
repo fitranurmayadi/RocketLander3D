@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
-def generate_report(telemetry_data, filename="falcon9_report.png"):
+def generate_report(telemetry_data, filename="images/rocketlander3d_report.png"):
     d = telemetry_data
     if len(d['t']) == 0:
         print("No telemetry data to plot.")
@@ -78,6 +79,9 @@ def generate_report(telemetry_data, filename="falcon9_report.png"):
     ax.grid(True)
 
     plt.tight_layout()
+    dirname = os.path.dirname(filename)
+    if dirname:
+        os.makedirs(dirname, exist_ok=True)
     plt.savefig(filename)
     plt.close()
     print(f"Report saved to {filename}")

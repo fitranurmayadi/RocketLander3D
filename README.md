@@ -28,6 +28,22 @@ To view the current PPO agent in action:
 python enjoy_rl.py --model ./models/ppo_rocket_curriculum/rocket_final.zip --stats ./models/ppo_rocket_curriculum/vec_normalize.pkl
 ```
 
+## Quick Start (Mission Simulator)
+
+To run the trajectory-planned mission simulation with the RocketLander3D flight controller:
+
+```bash
+python rocketlander/run_rocketlander3d.py
+```
+
+To run it headless (no GUI):
+
+```bash
+python rocketlander/run_rocketlander3d.py --no-render
+```
+
+After the simulation completes, the performance report will be saved inside the `images/` directory as `images/ultimate_mission_report_rocketlander3d.png`.
+
 ## Training
 
 The environment supports curriculum learning out of the box. To start a training session:

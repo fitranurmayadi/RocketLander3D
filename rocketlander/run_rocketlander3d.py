@@ -14,7 +14,7 @@ from rocketlander.telemetry.telemetry import TelemetryLogger
 from rocketlander.visualization.report import generate_report
 
 def main():
-    parser = argparse.ArgumentParser(description="Falcon 9 Mission Simulator")
+    parser = argparse.ArgumentParser(description="RocketLander3D Mission Simulator")
     parser.add_argument("--no-render", action="store_true", help="Disable GUI")
     parser.add_argument("--ascent-alt", type=float, default=150.0)
     parser.add_argument("--waypoint", type=float, nargs=3, default=[500.0, 500.0, 1000.0])
@@ -209,7 +209,7 @@ def main():
     finally:
         print("Mission complete. Generating report...")
         data = telemetry.get_data()
-        generate_report(data, "ultimate_mission_report_falcon9.png")
+        generate_report(data, "images/ultimate_mission_report_rocketlander3d.png")
         env.close()
         if video_writer:
             video_writer.release()

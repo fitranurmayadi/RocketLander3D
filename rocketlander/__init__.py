@@ -1,1 +1,1 @@
-"""rocketlander – Falcon 9-inspired reusable rocket mission package."""
+"""rocketlander – RocketLander3D reusable rocket mission package."""
