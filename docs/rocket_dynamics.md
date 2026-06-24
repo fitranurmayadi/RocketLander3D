@@ -192,4 +192,4 @@ When the rocket is tilted, increasing throttle doesn't just push it up; it pushe
 
 ---
 ## Verification History
-Final verification for v0.6.0 completed on 2026-02-12. See [v0.6.0 report](file:///home/aiot/Projects/Reinforcement-Learning/RocketLander/docs/reports/final_verification_v0.6.0.md).
+Final verification for v0.6.0 completed on 2026-02-12. See [v0.6.0 report](reports/final_verification_v0.6.0.md).

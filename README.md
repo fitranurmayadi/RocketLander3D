@@ -15,8 +15,8 @@ A high-fidelity 3D Rocket Landing environment for reinforcement learning built w
 ## Installation
 
 ```bash
-git clone https://github.com/fitranurmayadi/Reinforcement-Learning.git
-cd Reinforcement-Learning/RocketLander
+git clone https://github.com/fitranurmayadi/RocketLander3D.git
+cd RocketLander3D
 pip install -e .
 ```
 
