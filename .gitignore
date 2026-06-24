@@ -43,3 +43,9 @@ output/
 *.csv
 *.txt
 
+# IDEs
+.vscode/
+
+# CAD temp and backup files
+tmp_*/
+*.FCBak
