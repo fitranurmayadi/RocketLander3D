@@ -61,17 +61,17 @@ The flight controller in `rocketlander` uses a **Cascaded Flight Control Archite
 
 ```mermaid
 flowchart TD
-    subgraph Guidance & Planning
+    subgraph "Guidance & Planning"
         TP["🚀 Trajectory Planner"]
     end
 
-    subgraph Flight Control System (FCS)
+    subgraph "Flight Control System (FCS)"
         HC["🎯 Horizontal Controller<br/>(Outer Loop)"]
         AC["⚙️ Attitude Controller<br/>(Inner Loop)"]
         AM["🎛️ Actuator Mixer"]
     end
 
-    subgraph Simulation Environment
+    subgraph "Simulation Environment"
         PE["🌎 PyBullet Physics Env"]
     end
 
