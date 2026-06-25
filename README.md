@@ -22,7 +22,7 @@ RocketLander3D simulates a slender SpaceX Falcon 9-style booster during its vert
 * **Dry Mass ($M_{\text{dry}}$)**: $300$ kg (empty fuel tank).
 * **Variable Mass**: Fuel consumption reduces the overall vehicle mass and moment of inertia in real-time according to:
 
-  $$ M(t) = M_{\text{dry}} + f(t) \cdot (M_{\text{wet}} - M_{\text{dry}}) $$
+$$ M(t) = M_{\text{dry}} + f(t) \cdot (M_{\text{wet}} - M_{\text{dry}}) $$
 
   where $f(t) \in [0, 1]$ is the normalized fuel level.
 * **Thrust-to-Weight Ratio (TWR)**:
@@ -79,7 +79,11 @@ The flight controller in `rocketlander` uses a **Cascaded Flight Control Archite
 ### 2.1 3D Quintic Polynomial Trajectory Planner
 To generate a dynamically feasible and smooth trajectory between waypoints, a 1D quintic (5th-degree) polynomial is solved independently for the $X, Y,$ and $Z$ axes:
 
-$$ \begin{aligned} p(t) &= a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4 + a_5 t^5 \\ \dot{p}(t) &= a_1 + 2 a_2 t + 3 a_3 t^2 + 4 a_4 t^3 + 5 a_5 t^4 \\ \ddot{p}(t) &= 2 a_2 + 6 a_3 t + 12 a_4 t^2 + 20 a_5 t^3 \end{aligned} $$
+$$ p(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4 + a_5 t^5 $$
+
+$$ \dot{p}(t) = a_1 + 2 a_2 t + 3 a_3 t^2 + 4 a_4 t^3 + 5 a_5 t^4 $$
+
+$$ \ddot{p}(t) = 2 a_2 + 6 a_3 t + 12 a_4 t^2 + 20 a_5 t^3 $$
 
 Given boundary conditions at $t=0$ (initial position $p_0$, velocity $v_0$, acceleration $a_0$) and $t=T$ (target position $p_T$, velocity $v_T$, acceleration $a_T$):
 
@@ -115,21 +119,21 @@ $$ \begin{aligned} u_{\text{roll}} &= K_{p,\text{att}} e_{\phi} + K_{i,\text{att
 
 * **Anti-Windup**: Integrals are clamped to prevent command saturation due to high vehicle inertia:
 
-  $$ \text{Limit}_{\text{integral}} = \frac{\text{Limit}_{\text{output}}}{K_i} $$
+$$ \text{Limit}_{\text{integral}} = \frac{\text{Limit}_{\text{output}}}{K_i} $$
 
 ### 2.4 Altitude & Vertical Rate Controller
 Altitude tracking is split into two modes:
 1. **Cascade Mode (Ascent/Hover)**:
 
-   $$ v_{z,\text{des}} = \text{PID}_{\text{alt}}(e_z) $$
+$$ v_{z,\text{des}} = \text{PID}_{\text{alt}}(e_z) $$
 
-   The desired vertical velocity delta is clamped dynamically based on altitude (e.g., max descent rate is $5$ m/s when near the ground, up to $80$ m/s at high altitudes) to ensure a soft touchdown.
+The desired vertical velocity delta is clamped dynamically based on altitude (e.g., max descent rate is $5$ m/s when near the ground, up to $80$ m/s at high altitudes) to ensure a soft touchdown.
 
-   $$ u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}} + v_{z,\text{des}}) $$
+$$ u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}} + v_{z,\text{des}}) $$
 
 2. **Direct Velocity Mode (Landing Burn)**:
 
-   $$ u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}}) $$
+$$ u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}}) $$
 
 ### 2.5 Actuator Mixer
 High-level control outputs $(T, \delta_p, \delta_r, u_{\text{roll}}, u_{\text{pitch}}, u_{\text{yaw}})$ are mapped directly to the 16D PyBullet actuator inputs:
