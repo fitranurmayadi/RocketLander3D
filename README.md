@@ -21,7 +21,9 @@ RocketLander3D simulates a slender SpaceX Falcon 9-style booster during its vert
 * **Wet Mass ($M_{\text{wet}}$)**: $3,000$ kg (full fuel tank).
 * **Dry Mass ($M_{\text{dry}}$)**: $300$ kg (empty fuel tank).
 * **Variable Mass**: Fuel consumption reduces the overall vehicle mass and moment of inertia in real-time according to:
-  $$M(t) = M_{\text{dry}} + f(t) \cdot (M_{\text{wet}} - M_{\text{dry}})$$
+  $$
+  M(t) = M_{\text{dry}} + f(t) \cdot (M_{\text{wet}} - M_{\text{dry}})
+  $$
   where $f(t) \in [0, 1]$ is the normalized fuel level.
 * **Thrust-to-Weight Ratio (TWR)**:
   * **Full Tank**: $\text{TWR} \approx 2.0$ (Heavy, slow response, high inertia).
@@ -76,54 +78,96 @@ The flight controller in `rocketlander` uses a **Cascaded Flight Control Archite
 
 ### 2.1 3D Quintic Polynomial Trajectory Planner
 To generate a dynamically feasible and smooth trajectory between waypoints, a 1D quintic (5th-degree) polynomial is solved independently for the $X, Y,$ and $Z$ axes:
-$$p(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4 + a_5 t^5$$
-$$\dot{p}(t) = a_1 + 2 a_2 t + 3 a_3 t^2 + 4 a_4 t^3 + 5 a_5 t^4$$
-$$\ddot{p}(t) = 2 a_2 + 6 a_3 t + 12 a_4 t^2 + 20 a_5 t^3$$
+$$
+\begin{aligned}
+p(t) &= a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4 + a_5 t^5 \\
+\dot{p}(t) &= a_1 + 2 a_2 t + 3 a_3 t^2 + 4 a_4 t^3 + 5 a_5 t^4 \\
+\ddot{p}(t) &= 2 a_2 + 6 a_3 t + 12 a_4 t^2 + 20 a_5 t^3
+\end{aligned}
+$$
 
 Given boundary conditions at $t=0$ (initial position $p_0$, velocity $v_0$, acceleration $a_0$) and $t=T$ (target position $p_T$, velocity $v_T$, acceleration $a_T$):
+
 1. $a_0 = p_0$
 2. $a_1 = v_0$
 3. $a_2 = \frac{a_0}{2}$
-4. The remaining coefficients $a_3, a_4, a_5$ are computed by solving:
-   $$
-   \begin{bmatrix} T^3 & T^4 & T^5 \\\\ 3T^2 & 4T^3 & 5T^4 \\\\ 6T & 12T^2 & 20T^3 \end{bmatrix}
-   \begin{bmatrix} a_3 \\\\ a_4 \\\\ a_5 \end{bmatrix}
-   =
-   \begin{bmatrix} p_T - a_0 - a_1 T - a_2 T^2 \\\\ v_T - a_1 - 2 a_2 T \\\\ a_T - 2 a_2 \end{bmatrix}
-   $$
+
+The remaining coefficients $a_3, a_4, a_5$ are computed by solving the following matrix equation:
+$$
+\begin{bmatrix}
+T^3 & T^4 & T^5 \\
+3T^2 & 4T^3 & 5T^4 \\
+6T & 12T^2 & 20T^3
+\end{bmatrix}
+\begin{bmatrix}
+a_3 \\
+a_4 \\
+a_5
+\end{bmatrix}
+=
+\begin{bmatrix}
+p_T - a_0 - a_1 T - a_2 T^2 \\
+v_T - a_1 - 2 a_2 T \\
+a_T - 2 a_2
+\end{bmatrix}
+$$
 
 ### 2.2 Cascaded Translation Controller
 The outer loop tracks horizontal positioning by computing the required lateral acceleration vector in the world frame:
-$$a_{x,\text{world}} = a_{d,x} + K_{p,\text{horiz}} e_x + K_{d,\text{horiz}} \dot{e}_x$$
-$$a_{y,\text{world}} = a_{d,y} + K_{p,\text{horiz}} e_y + K_{d,\text{horiz}} \dot{e}_y$$
+$$
+\begin{aligned}
+a_{x,\text{world}} &= a_{d,x} + K_{p,\text{horiz}} e_x + K_{d,\text{horiz}} \dot{e}_x \\
+a_{y,\text{world}} &= a_{d,y} + K_{p,\text{horiz}} e_y + K_{d,\text{horiz}} \dot{e}_y
+\end{aligned}
+$$
 where $e$ is the position error ($x_{\text{ref}} - x_{\text{actual}}$) and $\dot{e}$ is the velocity error.
 
 To map these accelerations to the rocket body's frame, we rotate them using the current yaw angle $\psi$:
-$$b_x = a_{x,\text{world}} \cos(\psi) + a_{y,\text{world}} \sin(\psi)$$
-$$b_y = -a_{x,\text{world}} \sin(\psi) + a_{y,\text{world}} \cos(\psi)$$
+$$
+\begin{aligned}
+b_x &= a_{x,\text{world}} \cos(\psi) + a_{y,\text{world}} \sin(\psi) \\
+b_y &= -a_{x,\text{world}} \sin(\psi) + a_{y,\text{world}} \cos(\psi)
+\end{aligned}
+$$
 
 Using the rocket's thrust force vectors, the desired Euler tilt angles (Pitch $\theta_{\text{des}}$ and Roll $\phi_{\text{des}}$) are derived as:
-$$\theta_{\text{des}} = \text{atan2}(b_x, g)$$
-$$\phi_{\text{des}} = \text{atan2}(-b_y, g)$$
+$$
+\begin{aligned}
+\theta_{\text{des}} &= \text{atan2}(b_x, g) \\
+\phi_{\text{des}} &= \text{atan2}(-b_y, g)
+\end{aligned}
+$$
 These values are clamped to safe angles ($[-1.0, 1.0]$ rad) to prevent aerodynamic instability and tumbling.
 
 ### 2.3 Attitude Controller (Inner Loop)
 The inner loop resolves attitude commands by executing separate PID controllers tracking the error between planned angles and actual Euler angles:
-$$u_{\text{roll}} = K_{p,\text{att}} e_{\phi} + K_{i,\text{att}} \int e_{\phi} dt + K_{d,\text{att}} \frac{de_{\phi}}{dt}$$
-$$u_{\text{pitch}} = K_{p,\text{att}} e_{\theta} + K_{i,\text{att}} \int e_{\theta} dt + K_{d,\text{att}} \frac{de_{\theta}}{dt}$$
-$$u_{\text{yaw}} = K_{p,\text{att}} e_{\psi} + K_{i,\text{att}} \int e_{\psi} dt + K_{d,\text{att}} \frac{de_{\psi}}{dt}$$
+$$
+\begin{aligned}
+u_{\text{roll}} &= K_{p,\text{att}} e_{\phi} + K_{i,\text{att}} \int e_{\phi} \, dt + K_{d,\text{att}} \frac{de_{\phi}}{dt} \\
+u_{\text{pitch}} &= K_{p,\text{att}} e_{\theta} + K_{i,\text{att}} \int e_{\theta} \, dt + K_{d,\text{att}} \frac{de_{\theta}}{dt} \\
+u_{\text{yaw}} &= K_{p,\text{att}} e_{\psi} + K_{i,\text{att}} \int e_{\psi} \, dt + K_{d,\text{att}} \frac{de_{\psi}}{dt}
+\end{aligned}
+$$
 
 * **Anti-Windup**: Integrals are clamped to prevent command saturation due to high vehicle inertia:
-  $$\text{Limit}_{\text{integral}} = \frac{\text{Limit}_{\text{output}}}{K_i}$$
+  $$
+  \text{Limit}_{\text{integral}} = \frac{\text{Limit}_{\text{output}}}{K_i}
+  $$
 
 ### 2.4 Altitude & Vertical Rate Controller
 Altitude tracking is split into two modes:
 1. **Cascade Mode (Ascent/Hover)**:
-   $$v_{z,\text{des}} = \text{PID}_{\text{alt}}(e_z)$$
+   $$
+   v_{z,\text{des}} = \text{PID}_{\text{alt}}(e_z)
+   $$
    The desired vertical velocity delta is clamped dynamically based on altitude (e.g., max descent rate is $5$ m/s when near the ground, up to $80$ m/s at high altitudes) to ensure a soft touchdown.
-   $$u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}} + v_{z,\text{des}})$$
+   $$
+   u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}} + v_{z,\text{des}})
+   $$
 2. **Direct Velocity Mode (Landing Burn)**:
-   $$u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}})$$
+   $$
+   u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}})
+   $$
 
 ### 2.5 Actuator Mixer
 High-level control outputs $(T, \delta_p, \delta_r, u_{\text{roll}}, u_{\text{pitch}}, u_{\text{yaw}})$ are mapped directly to the 16D PyBullet actuator inputs:
