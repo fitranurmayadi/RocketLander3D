@@ -59,21 +59,39 @@ The observation vector is a continuous space $s \in \mathbb{R}^{19}$:
 
 The flight controller in `rocketlander` uses a **Cascaded Flight Control Architecture** combined with a **3D Quintic Polynomial Trajectory Planner**.
 
-```
-[Trajectory Planner] ---> (Pos/Vel Refs) 
-                                 |
-                                 v
-                     [Horizontal Controller] 
-                                 |
-                          (Desired Roll/Pitch)
-                                 |
-                                 v
-                      [Attitude Controller] <--- (Current Roll/Pitch/Yaw)
-                                 |
-                       (RCS/Gimbal Commands)
-                                 |
-                                 v
-                          [Actuator Mixer] ---> [PyBullet Physics Env]
+```mermaid
+flowchart TD
+    subgraph Guidance & Planning
+        TP["🚀 Trajectory Planner"]
+    end
+
+    subgraph Flight Control System (FCS)
+        HC["🎯 Horizontal Controller<br/>(Outer Loop)"]
+        AC["⚙️ Attitude Controller<br/>(Inner Loop)"]
+        AM["🎛️ Actuator Mixer"]
+    end
+
+    subgraph Simulation Environment
+        PE["🌎 PyBullet Physics Env"]
+    end
+
+    %% Forward path
+    TP -->|"Reference State<br/>(Pos, Vel, Acc)"| HC
+    HC -->|"Desired Attitude<br/>(Roll, Pitch)"| AC
+    AC -->|"Abstract Torques<br/>(RCS & Gimbal)"| AM
+    AM -->|"16D Action Vector<br/>(Throttle, Gimbal, RCS, Legs)"| PE
+
+    %% Feedback path
+    PE -.->|"Telemetry Feedback<br/>(State: Pos, Vel, Euler, Ang Vel)"| TP
+    PE -.->|"Current Yaw"| HC
+    PE -.->|"Current Euler Angles"| AC
+
+    %% Styling
+    style TP fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style HC fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+    style AC fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+    style AM fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+    style PE fill:#fffbeb,stroke:#f59e0b,stroke-width:2px
 ```
 
 ### 2.1 3D Quintic Polynomial Trajectory Planner
