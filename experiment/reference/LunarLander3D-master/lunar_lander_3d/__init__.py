@@ -1,4 +1,4 @@
-"""LunarLander3D - A 3D Lunar Lander environment for reinforcement learning."""
+"""LunarLander3D - A 3D Lunar Lander environment and flight control simulation."""
 
 from gymnasium.envs.registration import register
 

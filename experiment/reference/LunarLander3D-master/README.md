@@ -4,11 +4,11 @@
 
 LunarLander3D is a high-fidelity 6-Degree-of-Freedom (6-DoF) lunar landing simulation environment built with Gymnasium and PyBullet.
 
-The project was originally started as an attempt to compare Reinforcement Learning and conventional control methods on an autonomous landing task. While existing LunarLander benchmarks provide a useful starting point, most operate in a simplified 2D setting and do not capture many of the challenges encountered in real flight-control systems.
+The project was originally started as an attempt to compare various control methods on an autonomous landing task. While existing LunarLander benchmarks provide a useful starting point, most operate in a simplified 2D setting and do not capture many of the challenges encountered in real flight-control systems.
 
 To address this limitation, LunarLander3D extends the classic Lunar Lander concept into a fully 3D environment featuring rigid-body dynamics, realistic actuator models, procedural terrain generation, and multiple autonomous landing controllers.
 
-The current focus of the project is Guidance, Navigation, and Control (GNC) research. Three controller architectures are included, ranging from classical PID control to trajectory-tracking methods. The environment is also designed to serve as a future testbed for Reinforcement Learning algorithms operating under realistic physical constraints.
+The current focus of the project is Guidance, Navigation, and Control (GNC) research. Three controller architectures are included, ranging from classical PID control to trajectory-tracking methods. The environment is also designed to serve as a future testbed for advanced flight control algorithms operating under realistic physical constraints.
 
 ---
 
@@ -16,7 +16,7 @@ The current focus of the project is Guidance, Navigation, and Control (GNC) rese
 
 This project began with a simple question:
 
-> How does Reinforcement Learning compare against conventional flight-control methods on an autonomous landing problem?
+> How do different control methods compare on an autonomous landing problem?
 
 Initially, the goal was to use the standard LunarLander environment provided by Gymnasium. However, its 2D nature limits the complexity of the control problem and does not fully represent the challenges involved in spacecraft guidance and landing.
 
@@ -26,7 +26,7 @@ Rather than modifying the existing benchmark, a new environment was developed fr
 - Model full rigid-body dynamics.
 - Support multiple control architectures.
 - Provide a common platform for comparing control strategies.
-- Serve as a future benchmark for Reinforcement Learning research.
+- Serve as a future benchmark for flight control research.
 
 The result is a flexible simulation platform that can be used to study:
 
@@ -35,7 +35,7 @@ The result is a flexible simulation platform that can be used to study:
 - Guidance systems
 - Trajectory generation
 - Robotics
-- Reinforcement Learning
+- Autonomous Control
 
 ---
 
@@ -84,7 +84,7 @@ These controllers provide baseline performance references and demonstrate differ
   - Guidance, Navigation & Control (GNC)
   - Robotics research
   - Autonomous systems
-  - Reinforcement Learning
+  - Autonomous Control
   - Optimal control research
 
 ---

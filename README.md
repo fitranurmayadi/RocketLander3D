@@ -1,6 +1,6 @@
 # RocketLander3D
 
-A high-fidelity 3D Rocket Landing environment for reinforcement learning and flight control simulations built with [Gymnasium](https://gymnasium.farama.org/) and [PyBullet](https://pybullet.org/).
+A high-fidelity 3D Rocket Landing environment and flight control simulation built with [Gymnasium](https://gymnasium.farama.org/) and [PyBullet](https://pybullet.org/).
 
 ## Simulation Previews
 
