@@ -23,7 +23,9 @@ RocketLander3D simulates a slender SpaceX Falcon 9-style booster during its vert
 * **Variable Mass**: Fuel consumption reduces the overall vehicle mass and moment of inertia in real-time according to:
 
   $$
+  \begin{aligned}
   M(t) = M_{\text{dry}} + f(t) \cdot (M_{\text{wet}} - M_{\text{dry}})
+  \end{aligned}
   $$
 
   where $f(t) \in [0, 1]$ is the normalized fuel level.
@@ -160,7 +162,9 @@ $$
 * **Anti-Windup**: Integrals are clamped to prevent command saturation due to high vehicle inertia:
 
   $$
+  \begin{aligned}
   \text{Limit}_{\text{integral}} = \frac{\text{Limit}_{\text{output}}}{K_i}
+  \end{aligned}
   $$
 
 ### 2.4 Altitude & Vertical Rate Controller
@@ -168,19 +172,25 @@ Altitude tracking is split into two modes:
 1. **Cascade Mode (Ascent/Hover)**:
 
    $$
+   \begin{aligned}
    v_{z,\text{des}} = \text{PID}_{\text{alt}}(e_z)
+   \end{aligned}
    $$
 
    The desired vertical velocity delta is clamped dynamically based on altitude (e.g., max descent rate is $5$ m/s when near the ground, up to $80$ m/s at high altitudes) to ensure a soft touchdown.
 
    $$
+   \begin{aligned}
    u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}} + v_{z,\text{des}})
+   \end{aligned}
    $$
 
 2. **Direct Velocity Mode (Landing Burn)**:
 
    $$
+   \begin{aligned}
    u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}})
+   \end{aligned}
    $$
 
 ### 2.5 Actuator Mixer
