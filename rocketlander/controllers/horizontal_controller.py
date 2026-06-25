@@ -33,9 +33,9 @@ class HorizontalController:
         desired_pitch = math.atan2(bx, 9.81)
         desired_roll = math.atan2(-by, 9.81)
         
-        # Clamp tilt to prevent tumbling (limit to ~57 degrees to stay safe from 80 deg crash limit)
-        desired_pitch = max(-1.00, min(1.00, desired_pitch))
-        desired_roll = max(-1.00, min(1.00, desired_roll))
+        # Clamp tilt to prevent tumbling (limit to ~34 degrees to prevent extreme swinging)
+        desired_pitch = max(-0.60, min(0.60, desired_pitch))
+        desired_roll = max(-0.60, min(0.60, desired_roll))
         
         # Required horizontal acceleration magnitude corresponding to the clamped desired tilt
         # Since a = g * tan(theta), we calculate the actual commanded horizontal acceleration

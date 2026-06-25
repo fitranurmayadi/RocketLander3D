@@ -25,7 +25,7 @@ class RocketLanderEnv(gym.Env):
         
         # Physics Parameters
         self.MAIN_ENGINE_POWER = 100000.0
-        self.RCS_FORCE = 6000.0
+        self.RCS_FORCE = 250.0
         # Aerodynamics Constants
         self.DRAG_COEFF = 0.5
         self.GND_EFF_COEFF = 0.8  # Extra thrust multiplier at ground level
@@ -440,7 +440,8 @@ class RocketLanderEnv(gym.Env):
         
         curr_pos, curr_quat = p.getBasePositionAndOrientation(self.rocketId)
         self.camera_target = 0.7 * self.camera_target + 0.3 * np.array(curr_pos)
-        self.camera_dist = 0.7 * self.camera_dist + 0.3 * (7.5 + curr_pos[2] * 0.05)
+        target_dist = min(7.5 + curr_pos[2] * 0.05, 15.0)
+        self.camera_dist = 0.7 * self.camera_dist + 0.3 * target_dist
         
         view_matrix = p.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=self.camera_target, distance=self.camera_dist,

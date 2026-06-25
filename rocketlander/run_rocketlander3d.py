@@ -158,9 +158,10 @@ def main():
             throttle = throttle / max(0.2, tilt_cos)
             throttle = max(0.0, min(1.0, throttle))
 
-            # Disable gimbal, rely on RCS globally (USER request)
-            gimbal_p = 0.0
-            gimbal_r = 0.0
+            # Scale gimbal inversely with throttle to maintain constant torque response
+            eff_throttle = max(0.1, throttle)
+            gimbal_p = (u_pitch / eff_throttle) * 0.05
+            gimbal_r = (u_roll / eff_throttle) * 0.05
 
             # 5. Mixer
             action = mixer.mix(throttle, gimbal_p, gimbal_r, u_roll, u_pitch, u_yaw, legs_deploy)
