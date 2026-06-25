@@ -17,11 +17,12 @@ A high-fidelity 3D Rocket Landing environment and flight control simulation buil
 RocketLander3D simulates a slender SpaceX Falcon 9-style booster during its vertical landing (VTVL) phases. The simulation incorporates realistic physical characteristics, variable mass dynamics, and constraints.
 
 ### 1.1 Physical & Mass Specifications
-* **Vehicle Geometry**: Slender "pencil" cylinder, height $\approx 5.0\text{ m}$.
-* **Wet Mass ($M_{\text{wet}}$)**: $3,000\text{ kg}$ (full fuel tank).
-* **Dry Mass ($M_{\text{dry}}$)**: $300\text{ kg}$ (empty fuel tank).
+* **Vehicle Geometry**: Slender "pencil" cylinder, height $\approx 5.0$ m.
+* **Wet Mass ($M_{\text{wet}}$)**: $3,000$ kg (full fuel tank).
+* **Dry Mass ($M_{\text{dry}}$)**: $300$ kg (empty fuel tank).
 * **Variable Mass**: Fuel consumption reduces the overall vehicle mass and moment of inertia in real-time according to:
-  $$M(t) = M_{\text{dry}} + \text{fuel}(t) \cdot (M_{\text{wet}} - M_{\text{dry}})$$
+  $$M(t) = M_{\text{dry}} + f(t) \cdot (M_{\text{wet}} - M_{\text{dry}})$$
+  where $f(t) \in [0, 1]$ is the normalized fuel level.
 * **Thrust-to-Weight Ratio (TWR)**:
   * **Full Tank**: $\text{TWR} \approx 2.0$ (Heavy, slow response, high inertia).
   * **Empty Tank**: $\text{TWR} \approx 20.0$ (Extremely agile, hyper-sensitive throttle).
@@ -31,11 +32,11 @@ The action vector is a continuous space $u \in [-1, 1]^{16}$ containing 16 dimen
 
 | Index | Component | Mathematical Mapping | Physical Behavior & Range |
 | :--- | :--- | :--- | :--- |
-| **0** | **Main Engine Throttle** | $T = \frac{u_0 + 1}{2}$ | $0\%$ to $100\%$ ($60,000\text{ N}$ Max thrust). |
-| **1** | **Gimbal Pitch ($\delta_p$)** | $\delta_p = u_1 \cdot 0.35$ | Pitch deflection range: $[-0.35, 0.35]\text{ rad}$. |
-| **2** | **Gimbal Roll ($\delta_r$)** | $\delta_r = u_2 \cdot 0.35$ | Roll deflection range: $[-0.35, 0.35]\text{ rad}$. |
+| **0** | **Main Engine Throttle** | $T = \frac{u_0 + 1}{2}$ | $0\%$ to $100\%$ ($60,000$ N Max thrust). |
+| **1** | **Gimbal Pitch ($\delta_p$)** | $\delta_p = u_1 \cdot 0.35$ | Pitch deflection range: $[-0.35, 0.35]$ rad. |
+| **2** | **Gimbal Roll ($\delta_r$)** | $\delta_r = u_2 \cdot 0.35$ | Roll deflection range: $[-0.35, 0.35]$ rad. |
 | **3-14** | **RCS Thrusters** | $R_i = \frac{u_i + 1}{2}$ | 12 discrete cold-gas thrusters ($0\%$ to $100\%$). |
-| **15** | **Landing Legs** | Linear LERP | Deploy threshold ($>0$ deploys legs from $1.507$ to $-1.2\text{ rad}$). |
+| **15** | **Landing Legs** | Linear LERP | Deploy threshold ($>0$ deploys legs from $1.507$ to $-1.2$ rad). |
 
 ### 1.3 Sensors & Observations
 The observation vector is a continuous space $s \in \mathbb{R}^{19}$:
@@ -44,8 +45,8 @@ The observation vector is a continuous space $s \in \mathbb{R}^{19}$:
 | :--- | :--- | :--- | :--- |
 | **0-2** | **Position** | Vector3 | World Coordinates $(X, Y, Z)$ in meters. |
 | **3-6** | **Orientation** | Quat | World Orientation Quaternion $(x, y, z, w)$. |
-| **7-9** | **Linear Velocity** | Vector3 | World velocity $(\dot{X}, \dot{Y}, \dot{Z})$ in $\text{m/s}$. |
-| **10-12** | **Angular Velocity** | Vector3 | Local body frame angular rates $(\omega_x, \omega_y, \omega_z)$ in $\text{rad/s}$. |
+| **7-9** | **Linear Velocity** | Vector3 | World velocity $(\dot{X}, \dot{Y}, \dot{Z})$ in m/s. |
+| **10-12** | **Angular Velocity** | Vector3 | Local body frame angular rates $(\omega_x, \omega_y, \omega_z)$ in rad/s. |
 | **13-16** | **Leg Contacts** | 4x Float | Binary indicator ($1.0$ if leg $i$ touches ground, $0.0$ otherwise). |
 | **17** | **Altitude** | Float | Altitude above ground (Global $Z$ coordinate). |
 | **18** | **Fuel** | Scalar | Normalized fuel remaining ($1.0 \to 0.0$). |
@@ -84,7 +85,12 @@ Given boundary conditions at $t=0$ (initial position $p_0$, velocity $v_0$, acce
 2. $a_1 = v_0$
 3. $a_2 = \frac{a_0}{2}$
 4. The remaining coefficients $a_3, a_4, a_5$ are computed by solving:
-   $$\begin{bmatrix} T^3 & T^4 & T^5 \\ 3T^2 & 4T^3 & 5T^4 \\ 6T & 12T^2 & 20T^3 \end{bmatrix} \begin{bmatrix} a_3 \\ a_4 \\ a_5 \end{bmatrix} = \begin{bmatrix} p_T - a_0 - a_1 T - a_2 T^2 \\ v_T - a_1 - 2 a_2 T \\ a_T - 2 a_2 \end{bmatrix}$$
+   $$
+   \begin{bmatrix} T^3 & T^4 & T^5 \\\\ 3T^2 & 4T^3 & 5T^4 \\\\ 6T & 12T^2 & 20T^3 \end{bmatrix}
+   \begin{bmatrix} a_3 \\\\ a_4 \\\\ a_5 \end{bmatrix}
+   =
+   \begin{bmatrix} p_T - a_0 - a_1 T - a_2 T^2 \\\\ v_T - a_1 - 2 a_2 T \\\\ a_T - 2 a_2 \end{bmatrix}
+   $$
 
 ### 2.2 Cascaded Translation Controller
 The outer loop tracks horizontal positioning by computing the required lateral acceleration vector in the world frame:
@@ -99,13 +105,13 @@ $$b_y = -a_{x,\text{world}} \sin(\psi) + a_{y,\text{world}} \cos(\psi)$$
 Using the rocket's thrust force vectors, the desired Euler tilt angles (Pitch $\theta_{\text{des}}$ and Roll $\phi_{\text{des}}$) are derived as:
 $$\theta_{\text{des}} = \text{atan2}(b_x, g)$$
 $$\phi_{\text{des}} = \text{atan2}(-b_y, g)$$
-These values are clamped to safe angles ($[-1.0, 1.0]\text{ rad}$) to prevent aerodynamic instability and tumbling.
+These values are clamped to safe angles ($[-1.0, 1.0]$ rad) to prevent aerodynamic instability and tumbling.
 
 ### 2.3 Attitude Controller (Inner Loop)
 The inner loop resolves attitude commands by executing separate PID controllers tracking the error between planned angles and actual Euler angles:
-$$u_{\text{roll}} = K_p e_{\phi} + K_i \int e_{\phi} dt + K_d \frac{de_{\phi}}{dt}$$
-$$u_{\text{pitch}} = K_p e_{\theta} + K_i \int e_{\theta} dt + K_d \frac{de_{\theta}}{dt}$$
-$$u_{\text{yaw}} = K_p e_{\psi} + K_i \int e_{\psi} dt + K_d \frac{de_{\psi}}{dt}$$
+$$u_{\text{roll}} = K_{p,\text{att}} e_{\phi} + K_{i,\text{att}} \int e_{\phi} dt + K_{d,\text{att}} \frac{de_{\phi}}{dt}$$
+$$u_{\text{pitch}} = K_{p,\text{att}} e_{\theta} + K_{i,\text{att}} \int e_{\theta} dt + K_{d,\text{att}} \frac{de_{\theta}}{dt}$$
+$$u_{\text{yaw}} = K_{p,\text{att}} e_{\psi} + K_{i,\text{att}} \int e_{\psi} dt + K_{d,\text{att}} \frac{de_{\psi}}{dt}$$
 
 * **Anti-Windup**: Integrals are clamped to prevent command saturation due to high vehicle inertia:
   $$\text{Limit}_{\text{integral}} = \frac{\text{Limit}_{\text{output}}}{K_i}$$
@@ -113,11 +119,11 @@ $$u_{\text{yaw}} = K_p e_{\psi} + K_i \int e_{\psi} dt + K_d \frac{de_{\psi}}{dt
 ### 2.4 Altitude & Vertical Rate Controller
 Altitude tracking is split into two modes:
 1. **Cascade Mode (Ascent/Hover)**:
-   $$v_{z,\text{desired\_delta}} = \text{PID}_{\text{alt}}(e_z)$$
-   The desired delta is clamped dynamically based on altitude (e.g., max descent rate is $5\text{ m/s}$ when near the ground, up to $80\text{ m/s}$ at high altitudes) to ensure a soft touchdown.
-   $$u_{\text{throttle}} = \text{gravity\_feedforward} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{error}} + v_{z,\text{desired\_delta}})$$
+   $$v_{z,\text{des}} = \text{PID}_{\text{alt}}(e_z)$$
+   The desired vertical velocity delta is clamped dynamically based on altitude (e.g., max descent rate is $5$ m/s when near the ground, up to $80$ m/s at high altitudes) to ensure a soft touchdown.
+   $$u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}} + v_{z,\text{des}})$$
 2. **Direct Velocity Mode (Landing Burn)**:
-   $$u_{\text{throttle}} = \text{gravity\_feedforward} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{error}})$$
+   $$u_{\text{throttle}} = g_{\text{ff}} + 0.05 \cdot a_{z,\text{ff}} + \text{PID}_{vz}(v_{z,\text{err}})$$
 
 ### 2.5 Actuator Mixer
 High-level control outputs $(T, \delta_p, \delta_r, u_{\text{roll}}, u_{\text{pitch}}, u_{\text{yaw}})$ are mapped directly to the 16D PyBullet actuator inputs:
@@ -151,12 +157,6 @@ To run in headless mode (faster, no PyBullet GUI):
 python rocketlander/run_rocketlander3d.py --no-render
 ```
 The resulting performance graph will be generated and saved at `images/ultimate_mission_report_rocketlander3d.png`.
-
-### RL Agent Visualization
-To view the trained RL PPO policy:
-```bash
-python enjoy_rl.py --model ./models/ppo_rocket_curriculum/rocket_final.zip --stats ./models/ppo_rocket_curriculum/vec_normalize.pkl
-```
 
 ---
 
