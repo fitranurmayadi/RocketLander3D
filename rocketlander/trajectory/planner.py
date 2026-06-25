@@ -29,20 +29,18 @@ class TrajectoryPlanner:
         seg1 = Trajectory3D(pos0, vel0, acc0, pos1, vel1, acc1, t1)
         self.segments.append(TrajectorySegment(seg1, t1, "Launch"))
         
-        # Segment 2: Gravity Turn / Ascent Arc
-        # Target [500, 500, 1000] but DO NOT stop! Keep flying forward at 25 m/s.
+        # Segment 2: Gravity Turn / Ascent Arc - Stop at waypoint!
         pos2 = np.array(self.config.waypoint)
-        vel2 = np.array([25.0, 25.0, 0.0])
+        vel2 = np.zeros(3)
         acc2 = np.zeros(3)
         t2 = 25.0
         
         seg2 = Trajectory3D(pos1, vel1, acc1, pos2, vel2, acc2, t2)
         self.segments.append(TrajectorySegment(seg2, t2, "GravityTurn"))
         
-        # Segment 3: Waypoint Coast (No braking)
-        # Let it keep drifting forward for 5 seconds naturally
-        pos3 = np.array([pos2[0] + vel2[0]*5.0, pos2[1] + vel2[1]*5.0, pos2[2]])
-        vel3 = np.array([25.0, 25.0, 0.0])
+        # Segment 3: Waypoint Coast (Hover at waypoint)
+        pos3 = pos2
+        vel3 = np.zeros(3)
         acc3 = np.zeros(3)
         t3 = 5.0
         

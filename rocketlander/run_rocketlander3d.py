@@ -130,23 +130,19 @@ def main():
                     ah_mag *= blend
                 else:
                     des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
-                throttle = max(throttle, ah_mag * 0.015)
 
             elif phase == MissionPhase.WAYPOINT_NAV:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
                 des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
-                throttle = max(throttle, ah_mag * 0.015)
 
             elif phase == MissionPhase.BOOSTBACK:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
                 des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
-                # Boostback relies heavily on horizontal thrust. Prevent altitude controller from starving horizontal!
-                throttle = max(throttle, ah_mag * 0.015)
 
             elif phase in [MissionPhase.ENTRY_BURN, MissionPhase.LANDING_BURN]:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
                 des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
-                throttle = max(throttle, ah_mag * 0.015)
+
                     
             # Use raw desired attitude for control. 
             # (Adding a low-pass filter here previously caused a 0.3s phase delay, destroying outer loop stability and causing the slow pendulum wobble!)
@@ -165,11 +161,6 @@ def main():
             # Disable gimbal, rely on RCS globally (USER request)
             gimbal_p = 0.0
             gimbal_r = 0.0
-
-            # Scale throttle by 1/cos(tilt) to compensate for thrust vertical projection loss during tilts
-            cos_tilt = math.cos(state.orn_euler[0]) * math.cos(state.orn_euler[1])
-            cos_tilt = max(0.1, abs(cos_tilt))
-            throttle = min(1.0, throttle / cos_tilt)
 
             # 5. Mixer
             action = mixer.mix(throttle, gimbal_p, gimbal_r, u_roll, u_pitch, u_yaw, legs_deploy)

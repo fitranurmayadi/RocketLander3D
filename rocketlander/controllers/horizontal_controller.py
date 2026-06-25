@@ -33,11 +33,14 @@ class HorizontalController:
         desired_pitch = math.atan2(bx, 9.81)
         desired_roll = math.atan2(-by, 9.81)
         
-        # Required horizontal acceleration magnitude
-        ah_mag = math.sqrt(bx**2 + by**2)
-        
         # Clamp tilt to prevent tumbling (limit to ~57 degrees to stay safe from 80 deg crash limit)
         desired_pitch = max(-1.00, min(1.00, desired_pitch))
         desired_roll = max(-1.00, min(1.00, desired_roll))
+        
+        # Required horizontal acceleration magnitude corresponding to the clamped desired tilt
+        # Since a = g * tan(theta), we calculate the actual commanded horizontal acceleration
+        ax_clamped = 9.81 * math.tan(desired_pitch)
+        ay_clamped = 9.81 * math.tan(desired_roll)
+        ah_mag = math.sqrt(ax_clamped**2 + ay_clamped**2)
         
         return desired_pitch, desired_roll, ah_mag
