@@ -197,7 +197,7 @@ def main():
                     planned_r *= blend_telemetry
             
             pad_dist = math.sqrt(state.pos[0]**2 + state.pos[1]**2)
-            telemetry.log(mission_time, phase, state.pos, state.vel, state.orn_euler, throttle, u_roll, u_pitch, u_yaw, cmd.desired_pos, planned_r, planned_p, cmd.desired_heading)
+            telemetry.log(mission_time, phase, state.pos, state.vel, state.orn_euler, state.ang_vel, throttle, u_roll, u_pitch, u_yaw, cmd.desired_pos, planned_r, planned_p, cmd.desired_heading)
             
             if step % 10 == 0:
                 telemetry.print_hud(mission_time, phase, state.pos, state.vel, state.orn_euler, throttle)

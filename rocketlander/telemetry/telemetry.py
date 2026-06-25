@@ -8,13 +8,14 @@ class TelemetryLogger:
             'x': [], 'y': [], 'z': [],
             'vx': [], 'vy': [], 'vz': [],
             'roll': [], 'pitch': [], 'yaw': [],
+            'wx': [], 'wy': [], 'wz': [],
             'throttle': [],
             'rcs_roll': [], 'rcs_pitch': [], 'rcs_yaw': [],
             'ref_x': [], 'ref_y': [], 'ref_z': [],
             'des_roll': [], 'des_pitch': [], 'des_yaw': []
         }
 
-    def log(self, t, phase, pos, vel, orn_euler, throttle, u_roll, u_pitch, u_yaw, ref_pos, des_r, des_p, des_y):
+    def log(self, t, phase, pos, vel, orn_euler, ang_vel, throttle, u_roll, u_pitch, u_yaw, ref_pos, des_r, des_p, des_y):
         self.history['t'].append(t)
         self.history['phase'].append(phase.value)
         self.history['x'].append(pos[0])
@@ -26,6 +27,9 @@ class TelemetryLogger:
         self.history['roll'].append(orn_euler[0])
         self.history['pitch'].append(orn_euler[1])
         self.history['yaw'].append(orn_euler[2])
+        self.history['wx'].append(ang_vel[0])
+        self.history['wy'].append(ang_vel[1])
+        self.history['wz'].append(ang_vel[2])
         self.history['throttle'].append(throttle)
         self.history['rcs_roll'].append(u_roll)
         self.history['rcs_pitch'].append(u_pitch)
