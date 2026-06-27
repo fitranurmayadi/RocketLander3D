@@ -13,8 +13,8 @@ class HorizontalController:
         # This tightly locks onto the trajectory preventing any lazy drift or floating,
         # ensuring the landing is exactly at [0.0, 0.0].
         # Extremely overdamped to account for attitude response delays
-        kp = 0.4
-        kd = 2.0
+        kp = 0.3
+        kd = 1.5
         
         # Add feedforward acceleration to eliminate tracking lag
         ax_world = desired_acc[0] + kp * pos_error[0] + kd * vel_error[0]
@@ -33,9 +33,10 @@ class HorizontalController:
         desired_pitch = math.atan2(bx, 9.81)
         desired_roll = math.atan2(-by, 9.81)
         
-        # Clamp tilt to prevent tumbling (limit to ~34 degrees to prevent extreme swinging)
-        desired_pitch = max(-0.60, min(0.60, desired_pitch))
-        desired_roll = max(-0.60, min(0.60, desired_roll))
+        # Clamp tilt to prevent tumbling. With body-frame errors, we can handle 30 degrees (0.52 rad).
+        max_tilt = 0.52  # ~30 degrees
+        desired_pitch = max(-max_tilt, min(max_tilt, desired_pitch))
+        desired_roll = max(-max_tilt, min(max_tilt, desired_roll))
         
         # Required horizontal acceleration magnitude corresponding to the clamped desired tilt
         # Since a = g * tan(theta), we calculate the actual commanded horizontal acceleration

@@ -144,12 +144,17 @@ def main():
                 des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
 
                     
-            # Use raw desired attitude for control. 
-            # (Adding a low-pass filter here previously caused a 0.3s phase delay, destroying outer loop stability and causing the slow pendulum wobble!)
+            # Use body-frame quaternion-based attitude error
+            q_des = p.getQuaternionFromEuler([des_r, des_p, cmd.desired_heading])
+            q_curr = state.orn_quat
+            inv_q = [-q_curr[0], -q_curr[1], -q_curr[2], q_curr[3]]
+            _, q_err = p.multiplyTransforms([0,0,0], inv_q, [0,0,0], q_des)
+            err_euler = p.getEulerFromQuaternion(q_err)
+
             u_roll, u_pitch, u_yaw = att_ctrl.compute(
-                des_r - state.orn_euler[0], 
-                des_p - state.orn_euler[1], 
-                cmd.desired_heading - state.orn_euler[2]
+                err_euler[0], 
+                err_euler[1], 
+                err_euler[2]
             )
 
             # Apply tilt compensation to throttle so rocket doesn't lose altitude when tilted
@@ -159,9 +164,11 @@ def main():
             throttle = max(0.0, min(1.0, throttle))
 
             # Scale gimbal inversely with throttle to maintain constant torque response
+            # Gain 0.5: at max u and 15% throttle, gimbal saturates at full deflection (correct)
+            # At max u and 100% throttle, gimbal uses 50% deflection (proportional, good)
             eff_throttle = max(0.1, throttle)
-            gimbal_p = (u_pitch / eff_throttle) * 0.05
-            gimbal_r = (u_roll / eff_throttle) * 0.05
+            gimbal_p = (u_pitch / eff_throttle) * 0.5
+            gimbal_r = (u_roll / eff_throttle) * 0.5
 
             # 5. Mixer
             action = mixer.mix(throttle, gimbal_p, gimbal_r, u_roll, u_pitch, u_yaw, legs_deploy)

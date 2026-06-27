@@ -30,6 +30,7 @@ class TrajectoryPlanner:
         self.segments.append(TrajectorySegment(seg1, t1, "Launch"))
         
         # Segment 2: Gravity Turn / Ascent Arc - Coast through waypoint
+        # Velocity limited to match 15° tilt control authority (max horiz accel ~2.6 m/s²)
         pos2 = np.array(self.config.waypoint)
         vel2 = np.array([40.0, 40.0, 20.0])
         acc2 = np.zeros(3)
