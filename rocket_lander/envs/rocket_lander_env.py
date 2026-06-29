@@ -25,7 +25,7 @@ class RocketLanderEnv(gym.Env):
         
         # Physics Parameters
         self.MAIN_ENGINE_POWER = 100000.0
-        self.RCS_FORCE = 250.0
+        self.RCS_FORCE = 6000.0
         # Aerodynamics Constants
         self.DRAG_COEFF = 0.5
         self.GND_EFF_COEFF = 0.8  # Extra thrust multiplier at ground level

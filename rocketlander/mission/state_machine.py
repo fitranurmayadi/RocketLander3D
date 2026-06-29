@@ -15,7 +15,7 @@ class MissionConfig:
     def __init__(self):
         self.ignition_delay = 2.0
         self.ascent_target_alt = 1000.0
-        self.waypoint = [500.0, 500.0, 1000.0]
+        self.waypoint = [1000.0, 1000.0, 1000.0]
         self.landing_pad = [0.0, 0.0, 0.0]
 
 class RocketState:
@@ -62,7 +62,7 @@ class MissionStateMachine:
                 hor_dist = math.sqrt(state.pos[0]**2 + state.pos[1]**2)
                 if state.pos[2] < 150.0 and hor_dist < 20.0:
                     self._phase = MissionPhase.LANDING_BURN
-                elif self._phase != MissionPhase.LANDING_BURN:
+                else:
                     self._phase = MissionPhase.ENTRY_BURN
                 
             # Landing checks during LANDING_BURN

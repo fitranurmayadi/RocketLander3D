@@ -3,8 +3,8 @@ from rocketlander.controllers.pid import PID
 class AttitudeController:
     """Controls RCS/gimbal from attitude error (roll, pitch, yaw)."""
     def __init__(self, dt):
-        self.roll_pid = PID(kp=0.5, ki=0.0, kd=0.8, dt=dt, limit=1.0)
-        self.pitch_pid = PID(kp=0.5, ki=0.0, kd=0.8, dt=dt, limit=1.0)
+        self.roll_pid = PID(kp=2.0, ki=0.0, kd=1.0, dt=dt, limit=1.0)
+        self.pitch_pid = PID(kp=2.0, ki=0.0, kd=1.0, dt=dt, limit=1.0)
         self.yaw_pid = PID(kp=2.0, ki=0.0, kd=1.0, dt=dt, limit=1.0)
 
     def compute(self, roll_err, pitch_err, yaw_err) -> (float, float, float):

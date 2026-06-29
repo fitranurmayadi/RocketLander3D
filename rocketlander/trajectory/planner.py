@@ -29,19 +29,18 @@ class TrajectoryPlanner:
         seg1 = Trajectory3D(pos0, vel0, acc0, pos1, vel1, acc1, t1)
         self.segments.append(TrajectorySegment(seg1, t1, "Launch"))
         
-        # Segment 2: Gravity Turn / Ascent Arc - Coast through waypoint
-        # Velocity limited to match 15° tilt control authority (max horiz accel ~2.6 m/s²)
+        # Segment 2: Gravity Turn / Ascent Arc - Stop at waypoint!
         pos2 = np.array(self.config.waypoint)
-        vel2 = np.array([40.0, 40.0, 20.0])
+        vel2 = np.zeros(3)
         acc2 = np.zeros(3)
         t2 = 25.0
         
         seg2 = Trajectory3D(pos1, vel1, acc1, pos2, vel2, acc2, t2)
         self.segments.append(TrajectorySegment(seg2, t2, "GravityTurn"))
         
-        # Segment 3: Waypoint Coast (Drift along vector)
-        pos3 = pos2 + vel2 * 5.0
-        vel3 = vel2
+        # Segment 3: Waypoint Coast (Hover at waypoint)
+        pos3 = pos2
+        vel3 = np.zeros(3)
         acc3 = np.zeros(3)
         t3 = 5.0
         
