@@ -48,7 +48,7 @@ class TrajectoryPlanner:
         self.segments.append(TrajectorySegment(seg3, t3, "WaypointNav"))
         
         # Segment 4: Boostback / Entry (Starts from pos3 and heads back to pad)
-        pos4 = np.array([self.config.landing_pad[0], self.config.landing_pad[1], 250.0])
+        pos4 = np.array([self.config.landing_pad[0], self.config.landing_pad[1], 113.0])
         vel4 = np.array([0.0, 0.0, -10.0])
         acc4 = np.zeros(3)
         t4 = 25.0
@@ -60,7 +60,7 @@ class TrajectoryPlanner:
         pos5 = np.array([self.config.landing_pad[0], self.config.landing_pad[1], 3.0])
         vel5 = np.array([0.0, 0.0, -1.0])
         acc5 = np.zeros(3)
-        t5 = 10.0
+        t5 = 20.0
         
         seg5 = Trajectory3D(pos4, vel4, acc4, pos5, vel5, acc5, t5)
         self.segments.append(TrajectorySegment(seg5, t5, "LandingBurn"))
