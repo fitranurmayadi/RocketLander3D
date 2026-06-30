@@ -41,8 +41,15 @@ class HorizontalController:
         desired_roll = math.asin(-uy_clamped)
         desired_pitch = math.atan2(ux, uz)
         
-        desired_pitch = max(-1.00, min(1.00, desired_pitch))
-        desired_roll = max(-1.00, min(1.00, desired_roll))
+        # Phase-dependent maximum tilt clamp: Keep rocket upright during entry and landing burns
+        from rocketlander.mission.state_machine import MissionPhase
+        if phase in [MissionPhase.ENTRY_BURN, MissionPhase.LANDING_BURN]:
+            max_tilt = 0.20 # ~11.5 degrees
+        else:
+            max_tilt = 1.00 # ~57.3 degrees
+            
+        desired_pitch = max(-max_tilt, min(max_tilt, desired_pitch))
+        desired_roll = max(-max_tilt, min(max_tilt, desired_roll))
         
         # Calculate actual clamped acceleration magnitude
         ax_clamped = 9.81 * math.sin(desired_pitch) * math.cos(desired_roll)

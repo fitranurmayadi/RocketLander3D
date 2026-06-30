@@ -136,12 +136,7 @@ def main():
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
                 des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
 
-            elif phase == MissionPhase.ENTRY_BURN:
-                throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
-                des_p = 0.0
-                des_r = 0.0
-
-            elif phase == MissionPhase.LANDING_BURN:
+            elif phase in [MissionPhase.ENTRY_BURN, MissionPhase.LANDING_BURN]:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
                 des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
 
@@ -184,9 +179,6 @@ def main():
             if phase in [MissionPhase.ASCENT, MissionPhase.WAYPOINT_NAV]:
                 planned_p = max(0.0, planned_p)
                 planned_r = min(0.0, planned_r)
-            elif phase == MissionPhase.ENTRY_BURN:
-                planned_p = 0.0
-                planned_r = 0.0
             
             pad_dist = math.sqrt(state.pos[0]**2 + state.pos[1]**2)
             telemetry.log(mission_time, phase, state.pos, state.vel, state.orn_euler, state.ang_vel, throttle, u_roll, u_pitch, u_yaw, cmd.desired_pos, planned_r, planned_p, cmd.desired_heading)
