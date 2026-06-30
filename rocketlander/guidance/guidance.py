@@ -34,9 +34,7 @@ class GuidanceModule:
         # To prevent Euler angle cross-coupling (which causes lateral deviation in top-down view),
         # we align the rocket's yaw EXACTLY with the straight-line path of the trajectory.
         # Since it's a constant angle per phase, it will NOT oscillate!
-        config = self.planner.config
-        # Keep the heading (Yaw) fixed towards the target for the ENTIRE mission.
-        # To fly backward during boostback, the rocket will naturally pitch backwards 
-        # instead of spinning 180 degrees in yaw!
-        cmd.desired_heading = math.atan2(config.waypoint[1], config.waypoint[0])
+        # Keep the heading (Yaw) fixed at 0.0 to prevent any yaw rotation.
+        # Targeting will be handled purely by roll and pitch.
+        cmd.desired_heading = 0.0
         return cmd

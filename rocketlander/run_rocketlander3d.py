@@ -120,37 +120,34 @@ def main():
                 
             elif phase == MissionPhase.ASCENT:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
-                if state.pos[2] < 100.0:
-                    des_p, des_r, ah_mag = 0.0, 0.0, 0.0
-                elif state.pos[2] < 200.0:
-                    blend = (state.pos[2] - 100.0) / 100.0
-                    des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
-                    des_p *= blend
-                    des_r *= blend
-                    ah_mag *= blend
-                else:
-                    des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
+                des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
+                # Clamp tilt to only go forward towards the waypoint (no backward tilt)
+                des_p = max(0.0, des_p)
+                des_r = min(0.0, des_r)
 
             elif phase == MissionPhase.WAYPOINT_NAV:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
-                des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
+                des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
+                # Clamp tilt to only go forward towards the waypoint (no backward tilt)
+                des_p = max(0.0, des_p)
+                des_r = min(0.0, des_r)
 
             elif phase == MissionPhase.BOOSTBACK:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
-                des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
+                des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
 
             elif phase in [MissionPhase.ENTRY_BURN, MissionPhase.LANDING_BURN]:
                 throttle = alt_ctrl.compute(cmd.pos_error[2], cmd.vel_error[2], cmd.desired_acc[2], current_alt=state.pos[2])
-                des_p, des_r, ah_mag = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2])
+                des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
 
                     
-            # Use raw desired attitude for control. 
-            # (Adding a low-pass filter here previously caused a 0.3s phase delay, destroying outer loop stability and causing the slow pendulum wobble!)
-            u_roll, u_pitch, u_yaw = att_ctrl.compute(
-                des_r - state.orn_euler[0], 
-                des_p - state.orn_euler[1], 
-                cmd.desired_heading - state.orn_euler[2]
-            )
+            # Scale yaw error by cos(pitch) to compensate for the 1/cos(pitch) Euler rate singularity, keeping yaw stable.
+            # Roll and Pitch remain unscaled to preserve perfect symmetry and control authority.
+            roll_err = des_r - state.orn_euler[0]
+            pitch_err = des_p - state.orn_euler[1]
+            yaw_err = (cmd.desired_heading - state.orn_euler[2]) * math.cos(state.orn_euler[1])
+            
+            u_roll, u_pitch, u_yaw = att_ctrl.compute(roll_err, pitch_err, yaw_err)
 
             # Apply tilt compensation to throttle so rocket doesn't lose altitude when tilted
             # Approximating cosine of total tilt
@@ -170,7 +167,7 @@ def main():
             mission_time += dt
 
             # 7. Telemetry
-            # Calculate mathematically pure planned attitude (Feed-Forward only) for smooth plotting
+            # Calculate mathematically pure planned attitude (Feed-Forward only) for symmetric plotting
             pure_ax, pure_ay = cmd.desired_acc[0], cmd.desired_acc[1]
             cy, sy = math.cos(cmd.desired_heading), math.sin(cmd.desired_heading)
             pure_bx = pure_ax * cy + pure_ay * sy
@@ -178,14 +175,10 @@ def main():
             planned_p = math.atan2(pure_bx, 9.81)
             planned_r = math.atan2(-pure_by, 9.81)
             
-            # Apply the identical blend constraint to the 'planned' telemetry so the graph reflects our smooth intent
-            if phase == MissionPhase.ASCENT:
-                if state.pos[2] < 100.0:
-                    planned_p, planned_r = 0.0, 0.0
-                elif state.pos[2] < 200.0:
-                    blend_telemetry = (state.pos[2] - 100.0) / 100.0
-                    planned_p *= blend_telemetry
-                    planned_r *= blend_telemetry
+            # Apply the identical directional constraint to the 'planned' telemetry so the graph reflects our intent
+            if phase in [MissionPhase.ASCENT, MissionPhase.WAYPOINT_NAV]:
+                planned_p = max(0.0, planned_p)
+                planned_r = min(0.0, planned_r)
             
             pad_dist = math.sqrt(state.pos[0]**2 + state.pos[1]**2)
             telemetry.log(mission_time, phase, state.pos, state.vel, state.orn_euler, state.ang_vel, throttle, u_roll, u_pitch, u_yaw, cmd.desired_pos, planned_r, planned_p, cmd.desired_heading)

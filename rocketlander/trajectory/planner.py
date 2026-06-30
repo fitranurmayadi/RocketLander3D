@@ -29,25 +29,25 @@ class TrajectoryPlanner:
         seg1 = Trajectory3D(pos0, vel0, acc0, pos1, vel1, acc1, t1)
         self.segments.append(TrajectorySegment(seg1, t1, "Launch"))
         
-        # Segment 2: Gravity Turn / Ascent Arc - Stop at waypoint!
+        # Segment 2: Gravity Turn / Ascent Arc - Fly through waypoint with non-zero forward velocity!
         pos2 = np.array(self.config.waypoint)
-        vel2 = np.zeros(3)
+        vel2 = np.array([10.0, 10.0, 0.0])
         acc2 = np.zeros(3)
         t2 = 25.0
         
         seg2 = Trajectory3D(pos1, vel1, acc1, pos2, vel2, acc2, t2)
         self.segments.append(TrajectorySegment(seg2, t2, "GravityTurn"))
         
-        # Segment 3: Waypoint Coast (Hover at waypoint)
-        pos3 = pos2
-        vel3 = np.zeros(3)
-        acc3 = np.zeros(3)
+        # Segment 3: Waypoint Coast (Fly through waypoint continuously)
         t3 = 5.0
+        pos3 = pos2 + vel2 * t3
+        vel3 = vel2
+        acc3 = np.zeros(3)
         
         seg3 = Trajectory3D(pos2, vel2, acc2, pos3, vel3, acc3, t3)
         self.segments.append(TrajectorySegment(seg3, t3, "WaypointNav"))
         
-        # Segment 4: Boostback / Entry
+        # Segment 4: Boostback / Entry (Starts from pos3 and heads back to pad)
         pos4 = np.array([self.config.landing_pad[0], self.config.landing_pad[1], 250.0])
         vel4 = np.array([0.0, 0.0, -10.0])
         acc4 = np.zeros(3)

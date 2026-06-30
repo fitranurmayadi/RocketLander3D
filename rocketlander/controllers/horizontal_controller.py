@@ -7,14 +7,15 @@ class HorizontalController:
     def __init__(self, dt):
         pass
         
-    def compute(self, pos_error, vel_error, desired_acc, current_yaw) -> (float, float):
-
-        # kp=0.8, kd=1.8 is CRITICALLY DAMPED (kd = 2*sqrt(kp)). 
-        # This tightly locks onto the trajectory preventing any lazy drift or floating,
-        # ensuring the landing is exactly at [0.0, 0.0].
-        # Extremely overdamped to account for attitude response delays
-        kp = 0.4
-        kd = 2.0
+    def compute(self, pos_error, vel_error, desired_acc, current_yaw, phase=None) -> (float, float):
+        # Dynamically adjust gains for landing burn precision
+        from rocketlander.mission.state_machine import MissionPhase
+        if phase == MissionPhase.LANDING_BURN:
+            kp = 0.8
+            kd = 2.5
+        else:
+            kp = 0.4
+            kd = 2.0
         
         # Add feedforward acceleration to eliminate tracking lag
         ax_world = desired_acc[0] + kp * pos_error[0] + kd * vel_error[0]
@@ -27,20 +28,25 @@ class HorizontalController:
         bx = ax_world * cy + ay_world * sy
         by = -ax_world * sy + ay_world * cy  
         
-        # Physics mapping: a = g * tan(theta) => theta = atan(a/g)
-        # Positive pitch tilts nose forward -> thrust points forward (+X)
-        # In PyBullet, pitch is around Y (forward/back) and roll is around X (left/right).
-        desired_pitch = math.atan2(bx, 9.81)
-        desired_roll = math.atan2(-by, 9.81)
+        # Use inverse kinematics of XYZ Euler sequence to calculate physically correct desired pitch/roll
+        # (This resolves the acceleration asymmetry between X and Y at high tilts where X acceleration
+        # is scaled by cos(roll) but Y is not scaled by cos(pitch))
+        tot_acc = math.sqrt(bx**2 + by**2 + 9.81**2)
+        ux = bx / tot_acc
+        uy = by / tot_acc
+        uz = 9.81 / tot_acc
         
-        # Clamp tilt to prevent tumbling (limit to ~57 degrees to stay safe from 80 deg crash limit)
+        # Clamp to avoid asin domain errors (limit to max ~57 degrees to stay safe from 80 deg crash limit)
+        uy_clamped = max(-0.84, min(0.84, uy))
+        desired_roll = math.asin(-uy_clamped)
+        desired_pitch = math.atan2(ux, uz)
+        
         desired_pitch = max(-1.00, min(1.00, desired_pitch))
         desired_roll = max(-1.00, min(1.00, desired_roll))
         
-        # Required horizontal acceleration magnitude corresponding to the clamped desired tilt
-        # Since a = g * tan(theta), we calculate the actual commanded horizontal acceleration
-        ax_clamped = 9.81 * math.tan(desired_pitch)
-        ay_clamped = 9.81 * math.tan(desired_roll)
+        # Calculate actual clamped acceleration magnitude
+        ax_clamped = 9.81 * math.sin(desired_pitch) * math.cos(desired_roll)
+        ay_clamped = -9.81 * math.sin(desired_roll)
         ah_mag = math.sqrt(ax_clamped**2 + ay_clamped**2)
         
         return desired_pitch, desired_roll, ah_mag
