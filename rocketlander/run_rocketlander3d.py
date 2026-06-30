@@ -73,9 +73,6 @@ def main():
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         video_writer = cv2.VideoWriter(args.record, fourcc, 60.0, (640, 480))
 
-    prev_des_r = 0.0
-    prev_des_p = 0.0
-
     try:
         for step in range(args.max_steps):
             if env.render_mode is not None:
@@ -144,22 +141,13 @@ def main():
                 des_p, des_r, _ = hor_ctrl.compute(cmd.pos_error, cmd.vel_error, cmd.desired_acc, state.orn_euler[2], phase)
 
                     
-            # Rate limit the desired attitude commands to prevent high angular velocity and jagged steps
-            # Limit rate of change to 0.8 rad/s (~46 deg/s)
-            max_rate = 0.8  # rad/s
-            max_step = max_rate * dt
-            des_r = max(prev_des_r - max_step, min(prev_des_r + max_step, des_r))
-            des_p = max(prev_des_p - max_step, min(prev_des_p + max_step, des_p))
-            prev_des_r = des_r
-            prev_des_p = des_p
-
             # Scale yaw error by cos(pitch) to compensate for the 1/cos(pitch) Euler rate singularity, keeping yaw stable.
             # Roll and Pitch remain unscaled to preserve perfect symmetry and control authority.
             roll_err = des_r - state.orn_euler[0]
             pitch_err = des_p - state.orn_euler[1]
             yaw_err = (cmd.desired_heading - state.orn_euler[2]) * math.cos(state.orn_euler[1])
             
-            u_roll, u_pitch, u_yaw = att_ctrl.compute(roll_err, pitch_err, yaw_err, state.ang_vel)
+            u_roll, u_pitch, u_yaw = att_ctrl.compute(roll_err, pitch_err, yaw_err)
 
             # Apply tilt compensation to throttle so rocket doesn't lose altitude when tilted
             # Approximating cosine of total tilt

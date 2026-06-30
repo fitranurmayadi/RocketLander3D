@@ -13,7 +13,7 @@ class PID:
         self.prev_error = 0.0
         self.value = 0.0
 
-    def update(self, error, is_angular=False, derivative=None):
+    def update(self, error, is_angular=False):
         if is_angular:
             # Normalize angular error to [-pi, pi]
             error = (error + math.pi) % (2 * math.pi) - math.pi
@@ -25,8 +25,7 @@ class PID:
             max_int = self.limit / self.ki
             self.integral = max(-max_int, min(max_int, self.integral))
 
-        if derivative is None:
-            derivative = (error - self.prev_error) / self.dt
+        derivative = (error - self.prev_error) / self.dt
 
         p_term = self.kp * error
         i_term = self.ki * self.integral
